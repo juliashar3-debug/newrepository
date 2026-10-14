@@ -182,17 +182,16 @@
       "name_status": "confirmed by user",
       "source_user_label": "User supplied IMG_6413.jpeg, IMG_6528.jpeg, IMG_6534.jpeg and inline team photo",
       "date": "2026-08-08",
-      "event_date_confirmed": false,
+      "event_date_confirmed": true,
       "date_source": {
-        "type": "EXIF DateTimeOriginal",
-        "value": "2026:08:08",
-        "all_three_photos_agree": true,
-        "status": "Photo capture date; event date awaiting confirmation"
+        "type": "user message",
+        "value": "дата мероприятия 8-9 августа",
+        "year": 2026
       },
       "reported_quarter": "2026-Q3",
       "included_in_current_report": true,
-      "inclusion_status": "included_per_user; event date and organizer pending",
-      "description_draft": "Совместный сплав сотрудников ЦКБА на байдарках по реке Проня в г. Рязани.",
+      "inclusion_status": "included_per_user; event date confirmed; organizer pending",
+      "description_draft": "Сплав сотрудников ЦКБА на байдарках по реке Проня в г. Рязани 8–9 августа 2026 года.",
       "effect_draft": "Развитие командного взаимодействия и взаимопомощи, укрепление связей между сотрудниками ЦКБА и популяризация активного отдыха на природе.",
       "effect_status": "proposed qualitative wording; not measured outcomes",
       "organizer": null,
@@ -221,7 +220,6 @@
       "photos_access": "Original JPEG files supplied as accessible attachments; preserved in repository",
       "layout_preference": "Group photo and two on-water photos for event slide when user confirms details",
       "pending_fields": [
-        "event date confirmation",
         "organizer"
       ],
       "location": {
@@ -236,7 +234,13 @@
         "method": "User-specified subtraction of two people from total people in group photo",
         "formula": "22 − 2 = 20",
         "source": "user message"
-      }
+      },
+      "photo_capture_date": {
+        "date": "2026-08-08",
+        "source": "EXIF DateTimeOriginal; all three photos"
+      },
+      "date_end": "2026-08-09",
+      "date_display": "8–9 августа 2026 года"
     }
   ],
   "cover_photos": {

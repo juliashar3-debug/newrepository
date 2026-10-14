@@ -1,0 +1,156 @@
+{
+  "organization": "АО ЦКБА, Совет молодых специалистов",
+  "events": [
+    {
+      "id": "relay_autumn",
+      "name": "Эстафета — осень",
+      "source_user_label": "это эстафета-осень",
+      "date": null,
+      "description_draft": "Участие сотрудников АО ЦКБА в осенней легкоатлетической эстафете. Командное прохождение дистанции с передачей эстафеты между участниками.",
+      "effect_draft": "Развитие командного взаимодействия и взаимоподдержки, укрепление корпоративных связей и популяризация активного образа жизни.",
+      "effect_status": "qualitative proposed wording; no measured results supplied",
+      "organizer": null,
+      "sms_attendance": null,
+      "total_attendance": null,
+      "photos": [
+        {
+          "conversation_image_order": 1,
+          "description": "Five runners finish together; horizontal professional race photo."
+        },
+        {
+          "conversation_image_order": 2,
+          "description": "Six people pose with ЦКБА/Высокоточные комплексы flag; horizontal photo."
+        },
+        {
+          "conversation_image_order": 3,
+          "description": "Two runners exchange relay; horizontal action photo."
+        },
+        {
+          "conversation_image_order": 4,
+          "description": "Individual runner, full-body vertical race photo."
+        },
+        {
+          "conversation_image_order": 5,
+          "description": "Wide group photo with two flags at Зеленая планета; horizontal photo."
+        },
+        {
+          "conversation_image_order": 6,
+          "description": "Three participants with flag; vertical photo."
+        }
+      ],
+      "photos_access": "Visible inline in conversation, not present as local image files and no sediment file IDs supplied; need original JPG/PNG files or archive for PPTX embedding.",
+      "layout_preference": "Use group photo and relay handover on event slide; consider finishing photo for cover. Keep photos unaltered except ordinary slide cropping.",
+      "quarter_status": "Date not provided; verify falls in July-September 2026 before final report.",
+      "reported_quarter": "2026-Q3",
+      "event_date_confirmed": false,
+      "included_in_current_report": false,
+      "inclusion_status": "excluded_by_user",
+      "inclusion_reason": "Пользователь исключил октябрьские события из III квартала; точная дата не предоставлена."
+    },
+    {
+      "id": "night_tula_run",
+      "name": "Забег «Ночная Тула»",
+      "source_user_label": "ночная тула забег",
+      "date": null,
+      "description_draft": "Участие команды сотрудников АО ЦКБА в городском ночном забеге «Ночная Тула». Совместное участие в массовом спортивном мероприятии в вечернее время.",
+      "effect_draft": "Популяризация активного образа жизни, укрепление командных и корпоративных связей, участие сотрудников в спортивной жизни города.",
+      "effect_status": "qualitative proposed wording; no measured results supplied",
+      "organizer": null,
+      "sms_attendance": null,
+      "total_attendance": null,
+      "photos": [
+        {
+          "conversation_image_order": 1,
+          "description": "Two employees run at night in themed accessories; vertical action photo."
+        },
+        {
+          "conversation_image_order": 2,
+          "description": "Corporate team with flags at Ночная Тула banner; horizontal group photo."
+        },
+        {
+          "conversation_image_order": 3,
+          "description": "Team with ЦКБА flag at race venue; horizontal group photo."
+        }
+      ],
+      "photos_access": "Visible inline in conversation; no local image paths or sediment IDs. User was already asked to provide JPG/PNG files or archive for PPTX embedding.",
+      "layout_preference": "Event slide: team photo with flag and vertical running photo, preserve source images. Possible cover photo: corporate team at race banner.",
+      "quarter_status": "User sends as material for Q3 2026; event date not independently established. Collect dates with remaining missing factual fields before final delivery.",
+      "reported_quarter": "2026-Q3",
+      "event_date_confirmed": false,
+      "included_in_current_report": false,
+      "inclusion_status": "pending_more_materials_and_date; not in current one-event draft"
+    },
+    {
+      "id": "hero_race",
+      "name": "Гонка героев",
+      "source_user_label": "участие в гонке героев",
+      "date": null,
+      "description_draft": "Командное участие сотрудников АО ЦКБА в спортивном мероприятии «Гонка героев» с прохождением полосы препятствий, требующей выносливости, взаимопомощи и согласованных действий.",
+      "effect_draft": "Развитие командного взаимодействия и взаимоподдержки, укрепление сплоченности коллектива, популяризация физической активности.",
+      "effect_status": "qualitative proposed wording; no measured results supplied",
+      "organizer": null,
+      "sms_attendance": null,
+      "total_attendance": null,
+      "photos": [
+        {
+          "conversation_image_order": 1,
+          "description": "Team climbing a muddy forest slope; vertical photo."
+        },
+        {
+          "conversation_image_order": 2,
+          "description": "Team after race at Гонка героев banner, with medals; horizontal photo."
+        },
+        {
+          "conversation_image_order": 3,
+          "description": "Team with ЦКБА flag at Гонка героев banner; horizontal group photo."
+        },
+        {
+          "conversation_image_order": 4,
+          "description": "Repository original: team on log obstacle. Previously an inline water-obstacle image was supplied, but it is not this JPEG."
+        }
+      ],
+      "photos_access": "Four original JPEGs available in repository; three used on event slide; cover blank.",
+      "layout_preference": "Cover: no photos. Event slide: medals, team with flag, team on log obstacle.",
+      "quarter_status": "User provided as a Q3 2026 event; date not supplied. Exclude October events.",
+      "reference_note": "Q2 report also has a Гонка героев event. Do not reuse its attendance, organizers or photos as Q3 facts.",
+      "photo_repository_manifest": [
+        {
+          "name": "image-14-10-26-03-39-1.jpeg",
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39-1.jpeg",
+          "size": 1251506,
+          "sha": "e6c561d4cc88506feb023995564303b2f6871405"
+        },
+        {
+          "name": "image-14-10-26-03-39-2.jpeg",
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39-2.jpeg",
+          "size": 1062753,
+          "sha": "1ddaeb67b48f333898a12bde49f9a870cdcaab4b"
+        },
+        {
+          "name": "image-14-10-26-03-39-3.jpeg",
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39-3.jpeg",
+          "size": 6229975,
+          "sha": "287866a0072adf2ed229d86dc78e6afda5af0887"
+        },
+        {
+          "name": "image-14-10-26-03-39.jpeg",
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39.jpeg",
+          "size": 3696008,
+          "sha": "c3304554048330e67ee41e1b3e01bf7e9443f86c"
+        }
+      ],
+      "reported_quarter": "2026-Q3",
+      "event_date_confirmed": false,
+      "included_in_current_report": true,
+      "inclusion_status": "included_in_draft_per_user; date_pending",
+      "visible_people_count": 22,
+      "visible_people_count_source": {
+        "image": "presentations/2026-Q3/image-14-10-26-03-39-3.jpeg",
+        "method": "visual count: 16 standing + 6 foreground",
+        "checked_against": "presentations/2026-Q3/image-14-10-26-03-39-2.jpeg",
+        "check_count": 22
+      },
+      "attendance_display": "22 человека (по фото)"
+    }
+  ]
+}

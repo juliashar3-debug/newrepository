@@ -9,7 +9,7 @@
       "description_draft": "Участие сотрудников АО ЦКБА в осенней легкоатлетической эстафете. Командное прохождение дистанции с передачей эстафеты между участниками.",
       "effect_draft": "Развитие командного взаимодействия и взаимоподдержки, укрепление корпоративных связей и популяризация активного образа жизни.",
       "effect_status": "qualitative proposed wording; no measured results supplied",
-      "organizer": null,
+      "organizer": "Тульское беговое сообщество «Тульский Марафон»",
       "sms_attendance": null,
       "total_attendance": null,
       "photos": [
@@ -45,7 +45,8 @@
       "event_date_confirmed": false,
       "included_in_current_report": false,
       "inclusion_status": "excluded_by_user",
-      "inclusion_reason": "Пользователь исключил октябрьские события из III квартала; точная дата не предоставлена."
+      "inclusion_reason": "Пользователь исключил октябрьские события из III квартала; точная дата не предоставлена.",
+      "organizer_source": "user instruction"
     },
     {
       "id": "night_tula_run",
@@ -55,7 +56,7 @@
       "description_draft": "Участие сотрудников ЦКБА совместно с сотрудниками «Высокоточных комплексов» в городском забеге «Ночная Тула» 18 июля 2026 года.",
       "effect_draft": "Укрепление связей между коллективами ЦКБА и «Высокоточных комплексов», поддержка командного взаимодействия и популяризация физической активности.",
       "effect_status": "qualitative proposed wording; no measured results supplied",
-      "organizer": "Серия событий «Тульский марафон»",
+      "organizer": "Тульское беговое сообщество «Тульский Марафон»",
       "sms_attendance": 17,
       "total_attendance": null,
       "photos": [
@@ -89,7 +90,7 @@
         "ЦКБА",
         "Высокоточные комплексы"
       ],
-      "organizer_source": "https://night.tulamarathon.org/",
+      "organizer_source": "user instruction",
       "visible_people_count": 23,
       "attendance_display": "23 человека (по фото команды)",
       "visible_people_count_source": {
@@ -174,7 +175,8 @@
         "checked_against": "presentations/2026-Q3/image-14-10-26-03-39-2.jpeg",
         "check_count": 22
       },
-      "attendance_display": "22 человека (по фото)"
+      "attendance_display": "22 человека (по фото)",
+      "planned_for_report": true
     },
     {
       "id": "kayak_trip_2026_08_08",
@@ -241,6 +243,164 @@
       },
       "date_end": "2026-08-09",
       "date_display": "8–9 августа 2026 года"
+    },
+    {
+      "reported_quarter": "2026-Q3",
+      "included_in_current_report": false,
+      "planned_for_report": true,
+      "description_status": "draft based on user request",
+      "effect_status": "proposed qualitative wording, not measured",
+      "photos": [],
+      "photos_access": "Awaiting event-specific photos and reliable association with this event",
+      "layout_preference": "Place common team photo in center of collage; preserve supplied reference styling",
+      "id": "dragon_boat_cup",
+      "name": "Кубок Тульского дракона — 2026",
+      "date": "2026-08-15",
+      "event_date_confirmed": true,
+      "date_source": {
+        "url": "https://vosvod-rossii.ru/novosti/v-tule-proshli-ezhegodnye-korporativnye-sorevnovaniya-po-greble-kubok-tulskogo-drakona-2026",
+        "event_date_not_publication_date": true
+      },
+      "location": "Тула, Центр водных видов спорта",
+      "organizer": "Министерство спорта Тульской области; Тульская областная федерация гребли на байдарках и каноэ",
+      "organizer_source": "https://mktula.ru/news/n/komanda-kbp-stala-pobeditelem-kubka-tulskogo-drakona/",
+      "total_attendance": 20,
+      "sms_attendance": 17,
+      "attendance_source": "user-provided team attendance; not all tournament participants",
+      "description_draft": "Командное участие сотрудников в корпоративных соревнованиях по гребле на лодках класса «Дракон».",
+      "effect_draft": "Развитие согласованности действий и взаимопомощи, укрепление командного духа.",
+      "inclusion_status": "planned; photos pending"
+    },
+    {
+      "reported_quarter": "2026-Q3",
+      "included_in_current_report": false,
+      "planned_for_report": true,
+      "description_status": "draft based on user request",
+      "effect_status": "proposed qualitative wording, not measured",
+      "photos": [],
+      "photos_access": "Awaiting event-specific photos and reliable association with this event",
+      "layout_preference": "Place common team photo in center of collage; preserve supplied reference styling",
+      "id": "evocom_5_10km",
+      "name": "ЭвоКом полумарафон «Тула»: дистанции 5 и 10 км",
+      "date": "2026-08-23",
+      "event_date_confirmed": true,
+      "date_source": {
+        "url": "https://tula.tulamarathon.org/about/schedule",
+        "note": "Main daytime 5 km and 10 km races on 23 August; full event 22–23 August; night 5 km also held 22 August"
+      },
+      "event_dates": {
+        "start": "2026-08-22",
+        "end": "2026-08-23"
+      },
+      "organizer": "Тульское беговое сообщество «Тульский Марафон»",
+      "organizer_source": "user instruction",
+      "total_attendance": null,
+      "sms_attendance": null,
+      "attendance_rules": {
+        "photo_count_variable": "N",
+        "total": "N",
+        "sms": "N − 8",
+        "source": "user instruction; «минут 8» interpreted as arithmetic «минус 8» in context",
+        "require_nonnegative": true
+      },
+      "description_draft": "Участие команды сотрудников в забегах на дистанции 5 и 10 км в рамках «ЭвоКом полумарафона Тула».",
+      "effect_draft": "Популяризация регулярной физической активности, укрепление корпоративных связей и взаимоподдержки.",
+      "inclusion_status": "planned; group photo needed for count"
+    },
+    {
+      "reported_quarter": "2026-Q3",
+      "included_in_current_report": false,
+      "planned_for_report": true,
+      "description_status": "draft based on user request",
+      "effect_status": "proposed qualitative wording, not measured",
+      "photos": [],
+      "photos_access": "Awaiting event-specific photos and reliable association with this event",
+      "layout_preference": "Place common team photo in center of collage; preserve supplied reference styling",
+      "id": "orienteering_2026_08_30",
+      "name": "Соревнования по спортивному ориентированию",
+      "date": "2026-08-30",
+      "event_date_confirmed": true,
+      "date_source": {
+        "type": "user message",
+        "year_from_report": 2026
+      },
+      "organizer": "Тульская федерация спортивного ориентирования",
+      "organizer_source": "user instruction",
+      "total_attendance": null,
+      "sms_attendance": null,
+      "attendance_rules": {
+        "photo_count_variable": "N",
+        "total": "N + 2",
+        "sms": "(N + 2) − 2 = N",
+        "source": "user instruction",
+        "require_nonnegative": true
+      },
+      "description_draft": "Участие сотрудников в соревнованиях по спортивному ориентированию с прохождением дистанции и поиском контрольных пунктов.",
+      "effect_draft": "Развитие навыков ориентирования, самостоятельного принятия решений и физической подготовки.",
+      "inclusion_status": "planned; group photo needed for count"
+    },
+    {
+      "reported_quarter": "2026-Q3",
+      "included_in_current_report": false,
+      "planned_for_report": true,
+      "description_status": "draft based on user request",
+      "effect_status": "proposed qualitative wording, not measured",
+      "photos": [],
+      "photos_access": "Awaiting event-specific photos and reliable association with this event",
+      "layout_preference": "Place common team photo in center of collage; preserve supplied reference styling",
+      "id": "armory_halfmarathon",
+      "name": "Полумарафон «Оружейная столица»",
+      "date": "2026-09-13",
+      "event_date_confirmed": true,
+      "date_source": {
+        "type": "user confirmation and organizer website",
+        "url": "https://armory.tulamarathon.org/about/schedule"
+      },
+      "source_user_label": "Тульский полумарафон; user explicitly identified «Оружейная столица», 13 September",
+      "organizer": "Тульское беговое сообщество «Тульский Марафон»",
+      "organizer_source": "user instruction",
+      "total_attendance": 38,
+      "sms_attendance": 28,
+      "attendance_source": "user-provided team attendance",
+      "description_draft": "Участие команды сотрудников в полумарафоне «Оружейная столица» в Туле.",
+      "effect_draft": "Поддержка активного образа жизни, укрепление командных и корпоративных связей.",
+      "inclusion_status": "planned; photos pending"
+    },
+    {
+      "reported_quarter": "2026-Q3",
+      "included_in_current_report": false,
+      "planned_for_report": true,
+      "description_status": "draft based on user request",
+      "effect_status": "proposed qualitative wording, not measured",
+      "photos": [],
+      "photos_access": "Awaiting event-specific photos and reliable association with this event",
+      "layout_preference": "Place common team photo in center of collage; preserve supplied reference styling",
+      "id": "museum_quiz_2026_09_17",
+      "name": "Интеллектуальная игра «Брейн-ринг» в музее оружия",
+      "name_status": "Identified on organizer-supporter site by exact date and venue supplied by user",
+      "date": "2026-09-17",
+      "event_date_confirmed": true,
+      "date_source": {
+        "type": "user and web",
+        "url": "https://soyuzmash71.ru/novosti/dmitrij-milyaev-privetstvoval-uchastnikov-intellektualnoj-igryi-%C2%ABbrejn-ring%C2%BB,-posvyashhennoj-dnyu-oruzhejnika"
+      },
+      "location": "Тульский государственный музей оружия («Шлем»)",
+      "location_source": "user confirmation",
+      "organizer": "При содействии Тульского регионального отделения Союза машиностроителей России",
+      "organizer_source": "https://soyuzmash71.ru/novosti/dmitrij-milyaev-privetstvoval-uchastnikov-intellektualnoj-igryi-%C2%ABbrejn-ring%C2%BB,-posvyashhennoj-dnyu-oruzhejnika",
+      "organizer_status": "Source explicitly confirms assistance in organization, not sole organizer or full organizing committee; government approved event plan",
+      "organizer_roles": [
+        {
+          "organization": "Тульское региональное отделение Союза машиностроителей России",
+          "role": "содействие в организации"
+        }
+      ],
+      "total_attendance": 6,
+      "sms_attendance": 6,
+      "attendance_source": "user-provided team attendance; not whole intellectual tournament",
+      "description_draft": "Участие команды сотрудников в интеллектуальной игре «Брейн-ринг», посвященной Дню оружейника, в Тульском музее оружия.",
+      "effect_draft": "Развитие эрудиции, командного обсуждения и навыков совместного принятия решений.",
+      "inclusion_status": "planned; photos pending"
     }
   ],
   "cover_photos": {
@@ -252,5 +412,24 @@
       ],
       "layout": "Two stacked photos on the right behind original navy curved boundary"
     }
-  }
+  },
+  "report_defaults": {
+    "running_event_organizer": "Тульское беговое сообщество «Тульский Марафон»",
+    "running_event_organizer_source": "user instruction",
+    "group_photo_position": "center",
+    "report_period": "2026-Q3"
+  },
+  "report_order": {
+    "2026-Q3": [
+      "night_tula_run",
+      "kayak_trip_2026_08_08",
+      "dragon_boat_cup",
+      "evocom_5_10km",
+      "orienteering_2026_08_30",
+      "hero_race",
+      "armory_halfmarathon",
+      "museum_quiz_2026_09_17"
+    ]
+  },
+  "report_order_source": "Keep Night Tula and kayak trip; new user sequence: dragons → Evocom → orienteering → existing Hero Race → Armory halfmarathon → museum quiz. Do not duplicate Hero Race."
 }

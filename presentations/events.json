@@ -179,7 +179,7 @@
     {
       "id": "kayak_trip_2026_08_08",
       "name": "Сплав на байдарках",
-      "name_status": "inferred from photos; awaiting user confirmation",
+      "name_status": "confirmed by user",
       "source_user_label": "User supplied IMG_6413.jpeg, IMG_6528.jpeg, IMG_6534.jpeg and inline team photo",
       "date": "2026-08-08",
       "event_date_confirmed": false,
@@ -190,13 +190,13 @@
         "status": "Photo capture date; event date awaiting confirmation"
       },
       "reported_quarter": "2026-Q3",
-      "included_in_current_report": false,
-      "inclusion_status": "materials_received; event details pending",
-      "description_draft": "Командный сплав на байдарках. Совместное прохождение водного маршрута и активный отдых участников на природе.",
-      "effect_draft": "Развитие взаимодействия и взаимопомощи, укрепление связей между участниками и популяризация активного отдыха.",
+      "included_in_current_report": true,
+      "inclusion_status": "included_per_user; event date and organizer pending",
+      "description_draft": "Совместный сплав сотрудников ЦКБА на байдарках по реке Проня в г. Рязани.",
+      "effect_draft": "Развитие командного взаимодействия и взаимопомощи, укрепление связей между сотрудниками ЦКБА и популяризация активного отдыха на природе.",
       "effect_status": "proposed qualitative wording; not measured outcomes",
       "organizer": null,
-      "sms_attendance": null,
+      "sms_attendance": 20,
       "total_attendance": null,
       "visible_people_count": 22,
       "visible_people_count_source": {
@@ -221,11 +221,22 @@
       "photos_access": "Original JPEG files supplied as accessible attachments; preserved in repository",
       "layout_preference": "Group photo and two on-water photos for event slide when user confirms details",
       "pending_fields": [
-        "event name confirmation",
         "event date confirmation",
-        "organizer",
-        "SMS participant count"
-      ]
+        "organizer"
+      ],
+      "location": {
+        "city": "Рязань",
+        "river": "Проня",
+        "source": "user message"
+      },
+      "participants_organizations": [
+        "ЦКБА"
+      ],
+      "sms_attendance_source": {
+        "method": "User-specified subtraction of two people from total people in group photo",
+        "formula": "22 − 2 = 20",
+        "source": "user message"
+      }
     }
   ],
   "cover_photos": {

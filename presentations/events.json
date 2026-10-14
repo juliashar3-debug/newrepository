@@ -51,34 +51,58 @@
       "id": "night_tula_run",
       "name": "Забег «Ночная Тула»",
       "source_user_label": "ночная тула забег",
-      "date": null,
-      "description_draft": "Участие команды сотрудников АО ЦКБА в городском ночном забеге «Ночная Тула». Совместное участие в массовом спортивном мероприятии в вечернее время.",
-      "effect_draft": "Популяризация активного образа жизни, укрепление командных и корпоративных связей, участие сотрудников в спортивной жизни города.",
+      "date": "2026-07-18",
+      "description_draft": "Участие сотрудников ЦКБА совместно с сотрудниками «Высокоточных комплексов» в городском забеге «Ночная Тула» 18 июля 2026 года.",
+      "effect_draft": "Укрепление связей между коллективами ЦКБА и «Высокоточных комплексов», поддержка командного взаимодействия и популяризация физической активности.",
       "effect_status": "qualitative proposed wording; no measured results supplied",
-      "organizer": null,
-      "sms_attendance": null,
+      "organizer": "Серия событий «Тульский марафон»",
+      "sms_attendance": 17,
       "total_attendance": null,
       "photos": [
         {
-          "conversation_image_order": 1,
-          "description": "Two employees run at night in themed accessories; vertical action photo."
+          "repository_path": "presentations/2026-Q3/night-tula-team.jpg",
+          "description": "Joint team photo at the corporate team banner"
         },
         {
-          "conversation_image_order": 2,
-          "description": "Corporate team with flags at Ночная Тула banner; horizontal group photo."
+          "repository_path": "presentations/2026-Q3/night-tula-runners-portrait.jpg",
+          "description": "Two runners in festive accessories"
         },
         {
-          "conversation_image_order": 3,
-          "description": "Team with ЦКБА flag at race venue; horizontal group photo."
+          "repository_path": "presentations/2026-Q3/night-tula-runners-wide.jpg",
+          "description": "Runners near the Tula Kremlin"
         }
       ],
-      "photos_access": "Visible inline in conversation; no local image paths or sediment IDs. User was already asked to provide JPG/PNG files or archive for PPTX embedding.",
-      "layout_preference": "Event slide: team photo with flag and vertical running photo, preserve source images. Possible cover photo: corporate team at race banner.",
-      "quarter_status": "User sends as material for Q3 2026; event date not independently established. Collect dates with remaining missing factual fields before final delivery.",
+      "photos_access": "All three user-supplied original photos retained in repository and placed on the event slide.",
+      "layout_preference": "Three stacked photos at right behind original navy curved boundary.",
+      "quarter_status": "18 July 2026 falls in Q3; date of the 2026 event verified on the organizer's site.",
       "reported_quarter": "2026-Q3",
-      "event_date_confirmed": false,
-      "included_in_current_report": false,
-      "inclusion_status": "pending_more_materials_and_date; not in current one-event draft"
+      "event_date_confirmed": true,
+      "included_in_current_report": true,
+      "inclusion_status": "included_per_user",
+      "date_source": {
+        "url": "https://night.tulamarathon.org/about/schedule",
+        "title": "Расписание забега «Ночная Тула»",
+        "event_year": 2026,
+        "photo_capture_date_confirmed": false
+      },
+      "participants_organizations": [
+        "ЦКБА",
+        "Высокоточные комплексы"
+      ],
+      "organizer_source": "https://night.tulamarathon.org/",
+      "visible_people_count": 23,
+      "attendance_display": "23 человека (по фото команды)",
+      "visible_people_count_source": {
+        "image": "presentations/2026-Q3/night-tula-team.jpg",
+        "method": "Visual count of posing team; bystanders outside the team excluded"
+      },
+      "sms_attendance_source": {
+        "method": "User-confirmed formula: visible team count minus 25%; rounded to nearest whole person",
+        "formula": "23 × (1 − 0.25)",
+        "exact": 17.25,
+        "rounded": 17,
+        "status": "calculated estimate; not confirmed individual membership"
+      }
     },
     {
       "id": "hero_race",
@@ -109,8 +133,8 @@
           "description": "Repository original: team on log obstacle. Previously an inline water-obstacle image was supplied, but it is not this JPEG."
         }
       ],
-      "photos_access": "Four original JPEGs available in repository; three used on event slide; cover blank.",
-      "layout_preference": "Cover: no photos. Event slide: medals, team with flag, team on log obstacle.",
+      "photos_access": "Four event originals and two cover-photo originals available; three photos on event slide, two user-selected photos on cover.",
+      "layout_preference": "Cover: user-selected team on obstacle and portrait on grass. Event slide unchanged: medals, team with flag, team on log obstacle.",
       "quarter_status": "User provided as a Q3 2026 event; date not supplied. Exclude October events.",
       "reference_note": "Q2 report also has a Гонка героев event. Do not reuse its attendance, organizers or photos as Q3 facts.",
       "photo_repository_manifest": [
@@ -152,5 +176,15 @@
       },
       "attendance_display": "22 человека (по фото)"
     }
-  ]
+  ],
+  "cover_photos": {
+    "2026-Q3": {
+      "source": "Two images supplied by user for first slide",
+      "photos": [
+        "presentations/2026-Q3/cover-team.jpg",
+        "presentations/2026-Q3/cover-portrait.jpg"
+      ],
+      "layout": "Two stacked photos on the right behind original navy curved boundary"
+    }
+  }
 }

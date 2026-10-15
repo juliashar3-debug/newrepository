@@ -46,7 +46,21 @@
       "included_in_current_report": false,
       "inclusion_status": "excluded_by_user",
       "inclusion_reason": "Пользователь исключил октябрьские события из III квартала; точная дата не предоставлена.",
-      "organizer_source": "user instruction"
+      "organizer_source": "user instruction",
+      "date_end": null,
+      "website_notes": "",
+      "repository_sources": {
+        "date": null,
+        "sms_attendance": null,
+        "total_attendance": null,
+        "organizer_source": "user instruction"
+      },
+      "website_import": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
+      },
+      "planned_for_report": false
     },
     {
       "id": "night_tula_run",
@@ -58,7 +72,7 @@
       "effect_status": "qualitative proposed wording; no measured results supplied",
       "organizer": "Тульское беговое сообщество «Тульский Марафон»",
       "sms_attendance": 17,
-      "total_attendance": null,
+      "total_attendance": 23,
       "photos": [
         {
           "repository_path": "presentations/2026-Q3/night-tula-team.jpg",
@@ -116,40 +130,79 @@
         "sms_attendance_display": "17 человек (расчетно: 23 × 0,75)",
         "team_attendance_display": "23 человека (по фото команды)",
         "effect": "Укрепление связей между коллективами ЦКБА\nи «Высокоточных комплексов», поддержка командного\nвзаимодействия и физической активности."
+      },
+      "date_end": null,
+      "website_notes": "",
+      "attendance_source": {
+        "image": "presentations/2026-Q3/night-tula-team.jpg",
+        "method": "Visual count of posing team; bystanders outside the team excluded"
+      },
+      "repository_sources": {
+        "date": "2026-07-18",
+        "sms_attendance": 17,
+        "total_attendance": null,
+        "date_source": {
+          "url": "https://night.tulamarathon.org/about/schedule",
+          "title": "Расписание забега «Ночная Тула»",
+          "event_year": 2026,
+          "photo_capture_date_confirmed": false
+        },
+        "organizer_source": "user instruction",
+        "visible_people_count": 23,
+        "visible_people_count_source": {
+          "image": "presentations/2026-Q3/night-tula-team.jpg",
+          "method": "Visual count of posing team; bystanders outside the team excluded"
+        },
+        "sms_attendance_source": {
+          "method": "User-confirmed formula: visible team count minus 25%; rounded to nearest whole person",
+          "formula": "23 × (1 − 0.25)",
+          "exact": 17.25,
+          "rounded": 17,
+          "status": "calculated estimate; not confirmed individual membership"
+        }
+      },
+      "website_import": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
       }
     },
     {
       "id": "hero_race",
       "name": "Гонка героев",
       "source_user_label": "участие в гонке героев",
-      "date": null,
-      "description_draft": "Командное участие сотрудников АО ЦКБА в спортивном мероприятии «Гонка героев» с прохождением полосы препятствий, требующей выносливости, взаимопомощи и согласованных действий.",
+      "date": "2026-09-05",
+      "description_draft": "Командное участие сотрудников АО ЦКБА и ЦНИИАГ в спортивном мероприятии «Гонка героев» с прохождением полосы препятствий, требующей выносливости, взаимопомощи и согласованных действий.",
       "effect_draft": "Развитие командного взаимодействия и взаимоподдержки, укрепление сплоченности коллектива, популяризация физической активности.",
       "effect_status": "qualitative proposed wording; no measured results supplied",
-      "organizer": null,
-      "sms_attendance": null,
-      "total_attendance": null,
+      "organizer": "АНО \"Лига героев\"",
+      "sms_attendance": 19,
+      "total_attendance": 20,
       "photos": [
         {
-          "conversation_image_order": 1,
-          "description": "Team climbing a muddy forest slope; vertical photo."
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39-1.jpeg",
+          "description": "Фотография «Гонки героев»",
+          "collage_position": ""
         },
         {
-          "conversation_image_order": 2,
-          "description": "Team after race at Гонка героев banner, with medals; horizontal photo."
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39-2.jpeg",
+          "description": "Фотография «Гонки героев»",
+          "collage_position": "top"
         },
         {
-          "conversation_image_order": 3,
-          "description": "Team with ЦКБА flag at Гонка героев banner; horizontal group photo."
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39-3.jpeg",
+          "description": "Фотография «Гонки героев»",
+          "collage_position": "center"
         },
         {
-          "conversation_image_order": 4,
-          "description": "Repository original: team on log obstacle. Previously an inline water-obstacle image was supplied, but it is not this JPEG."
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39.jpeg",
+          "description": "Фотография «Гонки героев»",
+          "collage_position": "bottom"
         }
       ],
       "photos_access": "Four event originals and two cover-photo originals available; three photos on event slide, two user-selected photos on cover.",
       "layout_preference": "Cover: user-selected team on obstacle and portrait on grass. Event slide unchanged: medals, team with flag, team on log obstacle.",
-      "quarter_status": "User provided as a Q3 2026 event; date not supplied. Exclude October events.",
+      "quarter_status": "Дата подтверждена пользователем в выгрузке сайта; относится к III кварталу 2026 года.",
       "reference_note": "Q2 report also has a Гонка героев event. Do not reuse its attendance, organizers or photos as Q3 facts.",
       "photo_repository_manifest": [
         {
@@ -178,9 +231,9 @@
         }
       ],
       "reported_quarter": "2026-Q3",
-      "event_date_confirmed": false,
+      "event_date_confirmed": true,
       "included_in_current_report": true,
-      "inclusion_status": "included_in_draft; date, organizer and SMS attendance pending",
+      "inclusion_status": "included_in_draft",
       "visible_people_count": 22,
       "visible_people_count_source": {
         "image": "presentations/2026-Q3/image-14-10-26-03-39-3.jpeg",
@@ -188,17 +241,65 @@
         "checked_against": "presentations/2026-Q3/image-14-10-26-03-39-2.jpeg",
         "check_count": 22
       },
-      "attendance_display": "22 человека (по фото)",
+      "attendance_display": "20 человек (команда; подтверждено пользователем)",
       "planned_for_report": true,
       "report_slide": 7,
       "report_content": {
         "name": "Гонка героев",
-        "description": "Командное участие сотрудников ЦКБА в гонке\nс полосой препятствий. Дата проведения: —.",
-        "organizer_display": "—",
-        "sms_attendance_display": "— человек",
-        "team_attendance_display": "22 человека (по фото команды)",
+        "description": "Командное участие сотрудников ЦКБА и ЦНИИАГ\nв гонке с полосой препятствий. 5 сентября 2026 года.",
+        "organizer_display": "АНО «Лига героев»",
+        "sms_attendance_display": "19 человек",
+        "team_attendance_display": "20 человек (команда ЦКБА и ЦНИИАГ)",
         "effect": "Развитие командного взаимодействия и взаимоподдержки,\nукрепление сплоченности коллектива\nи популяризация физической активности."
-      }
+      },
+      "date_end": "2026-09-05",
+      "website_notes": "",
+      "attendance_source": {
+        "type": "confirmed",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00",
+        "scope": "team attendance",
+        "value": 20
+      },
+      "sms_attendance_source": {
+        "type": "confirmed",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00",
+        "value": 19
+      },
+      "repository_sources": {
+        "date": null,
+        "sms_attendance": null,
+        "total_attendance": null,
+        "visible_people_count": 22,
+        "visible_people_count_source": {
+          "image": "presentations/2026-Q3/image-14-10-26-03-39-3.jpeg",
+          "method": "visual count: 16 standing + 6 foreground",
+          "checked_against": "presentations/2026-Q3/image-14-10-26-03-39-2.jpeg",
+          "check_count": 22
+        }
+      },
+      "website_import": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
+      },
+      "date_source": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
+      },
+      "participants_organizations": [
+        "ЦКБА",
+        "ЦНИИАГ"
+      ],
+      "organizer_source": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
+      },
+      "pending_fields": [],
+      "attendance_note": "Видимых людей на общем фото по-прежнему 22. В отчете использованы подтвержденные пользователем 20 участников команды и 19 из СМС; состав и роли людей по фото не определялись."
     },
     {
       "id": "kayak_trip_2026_08_08",
@@ -214,13 +315,13 @@
       },
       "reported_quarter": "2026-Q3",
       "included_in_current_report": true,
-      "inclusion_status": "included_in_draft; organizer pending",
-      "description_draft": "Сплав сотрудников ЦКБА на байдарках по реке Проня в г. Рязани 8–9 августа 2026 года.",
+      "inclusion_status": "included_in_draft",
+      "description_draft": "Сплав сотрудников ЦКБА и ЦНИИАГ на байдарках по реке Проня в г. Рязани 8–9 августа 2026 года.",
       "effect_draft": "Развитие командного взаимодействия и взаимопомощи, укрепление связей между сотрудниками ЦКБА и популяризация активного отдыха на природе.",
       "effect_status": "proposed qualitative wording; not measured outcomes",
-      "organizer": null,
+      "organizer": "СМ ЦКБА",
       "sms_attendance": 20,
-      "total_attendance": null,
+      "total_attendance": 22,
       "visible_people_count": 22,
       "visible_people_count_source": {
         "image": "presentations/2026-Q3/kayak/IMG_6413.jpeg",
@@ -246,16 +347,15 @@
       ],
       "photos_access": "Original JPEG files supplied as accessible attachments; preserved in repository",
       "layout_preference": "Top: blue kayak (IMG_6528.jpeg). Center: common team photo (IMG_6413.jpeg). Bottom: red kayak (IMG_6534.jpeg). Preserve reference curved navy boundary.",
-      "pending_fields": [
-        "organizer"
-      ],
+      "pending_fields": [],
       "location": {
         "city": "Рязань",
         "river": "Проня",
         "source": "user message"
       },
       "participants_organizations": [
-        "ЦКБА"
+        "ЦКБА",
+        "ЦНИИАГ"
       ],
       "sms_attendance_source": {
         "method": "User-specified subtraction of two people from total people in group photo",
@@ -272,11 +372,47 @@
       "report_slide": 3,
       "report_content": {
         "name": "Сплав на байдарках",
-        "description": "Сплав сотрудников ЦКБА по реке Проня в г. Рязани.\n8–9 августа 2026 года.",
-        "organizer_display": "—",
+        "description": "Сплав сотрудников ЦКБА и ЦНИИАГ по реке Проня.\n8–9 августа 2026 года, г. Рязань.",
+        "organizer_display": "СМ ЦКБА",
         "sms_attendance_display": "20 человек (расчетно: 22 − 2)",
         "team_attendance_display": "22 человека (по фото команды)",
         "effect": "Развитие командного взаимодействия и взаимопомощи,\nукрепление связей между сотрудниками ЦКБА\nи популяризация активного отдыха на природе."
+      },
+      "website_notes": "",
+      "attendance_source": {
+        "image": "presentations/2026-Q3/kayak/IMG_6413.jpeg",
+        "method": "Visual count of people in one common team photo; people in other photographs not added"
+      },
+      "repository_sources": {
+        "date": "2026-08-08",
+        "date_source": {
+          "type": "user message",
+          "value": "дата мероприятия 8-9 августа",
+          "year": 2026
+        },
+        "sms_attendance": 20,
+        "total_attendance": null,
+        "visible_people_count": 22,
+        "visible_people_count_source": {
+          "image": "presentations/2026-Q3/kayak/IMG_6413.jpeg",
+          "method": "Visual count of people in one common team photo; people in other photographs not added"
+        },
+        "sms_attendance_source": {
+          "method": "User-specified subtraction of two people from total people in group photo",
+          "formula": "22 − 2 = 20",
+          "source": "user message"
+        },
+        "date_end": "2026-08-09"
+      },
+      "website_import": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
+      },
+      "organizer_source": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
       }
     },
     {
@@ -334,6 +470,30 @@
         "sms_attendance_display": "17 человек",
         "team_attendance_display": "20 человек (команда ЦКБА)",
         "effect": "Развитие согласованности действий и взаимопомощи,\nукрепление командного духа и интереса\nк совместным спортивным мероприятиям."
+      },
+      "date_end": null,
+      "website_notes": "",
+      "sms_attendance_source": "user-provided team attendance; not all tournament participants",
+      "repository_sources": {
+        "photos_source": {
+          "type": "user message with three attachments",
+          "received_date": "2026-10-15",
+          "event_association": "это фото с лодок драконов"
+        },
+        "date": "2026-08-15",
+        "date_source": {
+          "url": "https://vosvod-rossii.ru/novosti/v-tule-proshli-ezhegodnye-korporativnye-sorevnovaniya-po-greble-kubok-tulskogo-drakona-2026",
+          "event_date_not_publication_date": true
+        },
+        "organizer_source": "https://mktula.ru/news/n/komanda-kbp-stala-pobeditelem-kubka-tulskogo-drakona/",
+        "total_attendance": 20,
+        "sms_attendance": 17,
+        "attendance_source": "user-provided team attendance; not all tournament participants"
+      },
+      "website_import": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
       }
     },
     {
@@ -368,20 +528,19 @@
       "layout_preference": "Top: night group photo (IMG_6950.jpeg). Center: main group photo with flag and medals at event banner (IMG_6985.jpeg). Bottom: two participants at mirror photo zone (IMG_7054.jpeg). Preserve reference styling and curved navy boundary; avoid stretching and keep faces visible when cropping.",
       "id": "evocom_5_10km",
       "name": "ЭвоКом полумарафон «Тула»: дистанции 5 и 10 км",
-      "date": "2026-08-23",
+      "date": "2026-08-22",
       "event_date_confirmed": true,
       "date_source": {
-        "url": "https://tula.tulamarathon.org/about/schedule",
-        "note": "Main daytime 5 km and 10 km races on 23 August; full event 22–23 August; night 5 km also held 22 August"
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
       },
       "event_dates": {
         "start": "2026-08-22",
         "end": "2026-08-23"
       },
-      "participation_dates_status": "Daytime race date retained as 23 August from the stored schedule. New photos include night and daytime scenes; exact date of the team's night start awaits user confirmation. Night 5 km is scheduled for 22 August; photos alone do not establish their capture dates.",
-      "pending_fields": [
-        "night_start_participation_date"
-      ],
+      "participation_dates_status": "Пользователь подтвердил даты участия 22–23 августа в выгрузке сайта.",
+      "pending_fields": [],
       "organizer": "Тульское беговое сообщество «Тульский Марафон»",
       "organizer_source": "user instruction",
       "total_attendance": 28,
@@ -411,16 +570,68 @@
       },
       "description_draft": "Участие команды сотрудников в забегах на дистанции 5 и 10 км в рамках «ЭвоКом полумарафона Тула».",
       "effect_draft": "Популяризация регулярной физической активности, укрепление корпоративных связей и взаимоподдержки.",
-      "inclusion_status": "included_in_draft; night participation date pending",
+      "inclusion_status": "included_in_draft",
       "report_slide": 5,
       "report_content": {
         "name": "«ЭвоКом полумарафон Тула»: дистанции 5 и 10 км",
-        "description": "Участие команды ЦКБА в забегах на 5 и 10 км.\n23 августа 2026 года; дата ночного старта уточняется.",
+        "description": "Участие команды ЦКБА в забегах на 5 и 10 км.\n22–23 августа 2026 года.",
         "organizer_display": "Тульское беговое сообщество «Тульский Марафон»",
         "sms_attendance_display": "20 человек (расчетно: 28 − 8)",
         "team_attendance_display": "28 человек (по фото команды)",
         "effect": "Популяризация регулярной физической активности,\nукрепление корпоративных связей\nи взаимоподдержки."
-      }
+      },
+      "date_end": "2026-08-23",
+      "website_notes": "",
+      "repository_sources": {
+        "photos_source": {
+          "type": "user message with three attachments",
+          "received_date": "2026-10-15",
+          "event_association": "это эвоком"
+        },
+        "date": "2026-08-23",
+        "date_source": {
+          "url": "https://tula.tulamarathon.org/about/schedule",
+          "note": "Main daytime 5 km and 10 km races on 23 August; full event 22–23 August; night 5 km also held 22 August"
+        },
+        "organizer_source": "user instruction",
+        "total_attendance": 28,
+        "sms_attendance": 20,
+        "visible_people_count": 28,
+        "visible_people_count_source": {
+          "image": "presentations/2026-Q3/evocom/IMG_6985.jpeg",
+          "method": "Visual count on one original group photo: 21 standing and 7 in the foreground, including the partially obscured person behind the raised arm on the left. Bystanders outside the posing group excluded; people on other photos not added.",
+          "scope": "People in the posing group, including accompanying people; not a verified roster of runners or the whole event audience."
+        },
+        "attendance_source": "Visual count of the posing group in IMG_6985.jpeg; not total event attendance or verified number of race finishers.",
+        "sms_attendance_source": {
+          "method": "User-specified event-only formula: group photo count minus 8",
+          "formula": "28 − 8 = 20",
+          "exact": 20,
+          "rounded": 20,
+          "status": "calculated estimate; individual SMS membership not established from photo",
+          "source": "Stored user instruction in attendance_rules; visual count of IMG_6985.jpeg"
+        },
+        "attendance_rules": {
+          "photo_count_variable": "N",
+          "total": "N",
+          "sms": "N − 8",
+          "source": "user instruction; «минут 8» interpreted as arithmetic «минус 8» in context",
+          "require_nonnegative": true
+        }
+      },
+      "website_import": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
+      },
+      "date_source_history": [
+        {
+          "url": "https://tula.tulamarathon.org/about/schedule",
+          "note": "Main daytime 5 km and 10 km races on 23 August; full event 22–23 August; night 5 km also held 22 August"
+        }
+      ],
+      "quarter_status": "Дата подтверждена пользователем в выгрузке сайта; относится к III кварталу 2026 года.",
+      "date_display": "22–23 августа 2026 года"
     },
     {
       "reported_quarter": "2026-Q3",
@@ -506,6 +717,58 @@
         "sms_attendance_display": "13 человек (расчетно: 15 − 2)",
         "team_attendance_display": "15 человек (расчетно: 13 по фото + 2)",
         "effect": "Развитие навыков ориентирования, самостоятельного\nпринятия решений и физической подготовки;\nподдержка интереса к активному отдыху."
+      },
+      "date_end": null,
+      "website_notes": "",
+      "repository_sources": {
+        "photos_source": {
+          "type": "user message with three attachments",
+          "received_date": "2026-10-15",
+          "event_association": "это спортивное ориентирование"
+        },
+        "date": "2026-08-30",
+        "date_source": {
+          "type": "user message",
+          "year_from_report": 2026
+        },
+        "organizer_source": "user instruction",
+        "total_attendance": 15,
+        "sms_attendance": 13,
+        "visible_people_count": 13,
+        "visible_people_count_source": {
+          "image": "presentations/2026-Q3/orienteering/IMG_7454.jpeg",
+          "method": "Visual count of all 13 people in one common group photo; people on other photos not added.",
+          "scope": "People visible in the user's group; not the whole competition audience."
+        },
+        "attendance_source": "User-specified event-only formulas applied to visual group count in IMG_7454.jpeg; not total competition attendance.",
+        "total_attendance_source": {
+          "method": "User-specified event-only formula: group photo count plus 2",
+          "formula": "13 + 2 = 15",
+          "exact": 15,
+          "rounded": 15,
+          "status": "calculated team attendance; not independently confirmed roster",
+          "source": "Stored user instruction in attendance_rules; visual count of IMG_7454.jpeg"
+        },
+        "sms_attendance_source": {
+          "method": "User-specified event-only formula: calculated team attendance minus 2",
+          "formula": "(13 + 2) − 2 = 13",
+          "exact": 13,
+          "rounded": 13,
+          "status": "calculated estimate; individual SMS membership not established from photo",
+          "source": "Stored user instruction in attendance_rules; visual count of IMG_7454.jpeg"
+        },
+        "attendance_rules": {
+          "photo_count_variable": "N",
+          "total": "N + 2",
+          "sms": "(N + 2) − 2 = N",
+          "source": "user instruction",
+          "require_nonnegative": true
+        }
+      },
+      "website_import": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
       }
     },
     {
@@ -563,6 +826,30 @@
         "sms_attendance_display": "28 человек",
         "team_attendance_display": "38 человек (команда ЦКБА)",
         "effect": "Поддержка активного образа жизни,\nукрепление командных и корпоративных связей,\nразвитие взаимоподдержки участников."
+      },
+      "date_end": null,
+      "website_notes": "",
+      "sms_attendance_source": "user-provided team attendance",
+      "repository_sources": {
+        "photos_source": {
+          "type": "user message with three attachments",
+          "received_date": "2026-10-15",
+          "event_association": "э то оружейная столица"
+        },
+        "date": "2026-09-13",
+        "date_source": {
+          "type": "user confirmation and organizer website",
+          "url": "https://armory.tulamarathon.org/about/schedule"
+        },
+        "organizer_source": "user instruction",
+        "total_attendance": 38,
+        "sms_attendance": 28,
+        "attendance_source": "user-provided team attendance"
+      },
+      "website_import": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
       }
     },
     {
@@ -620,7 +907,7 @@
       "attendance_source": "user-provided team attendance; not whole intellectual tournament",
       "description_draft": "Участие команды сотрудников в интеллектуальной игре «Брейн-ринг», посвященной Дню оружейника, в Тульском музее оружия.",
       "effect_draft": "Развитие эрудиции, командного обсуждения и навыков совместного принятия решений.",
-      "inclusion_status": "included_in_draft; assistance role confirmed; full organizer list not established",
+      "inclusion_status": "included_in_draft",
       "report_slide": 9,
       "report_content": {
         "name": "Интеллектуальная игра «Брейн-ринг»",
@@ -629,6 +916,31 @@
         "sms_attendance_display": "6 человек",
         "team_attendance_display": "6 человек (команда ЦКБА)",
         "effect": "Развитие эрудиции, командного обсуждения\nи навыков совместного принятия решений;\nрасширение интеллектуального досуга."
+      },
+      "date_end": null,
+      "website_notes": "Подтверждено содействие в организации; полный состав организаторов не установлен.",
+      "sms_attendance_source": "user-provided team attendance; not whole intellectual tournament",
+      "repository_sources": {
+        "photos_source": {
+          "type": "user message with three attachments",
+          "received_date": "2026-10-15",
+          "event_association": "это брейн ринг"
+        },
+        "date": "2026-09-17",
+        "date_source": {
+          "type": "user and web",
+          "url": "https://soyuzmash71.ru/novosti/dmitrij-milyaev-privetstvoval-uchastnikov-intellektualnoj-igryi-%C2%ABbrejn-ring%C2%BB,-posvyashhennoj-dnyu-oruzhejnika"
+        },
+        "location_source": "user confirmation",
+        "organizer_source": "https://soyuzmash71.ru/novosti/dmitrij-milyaev-privetstvoval-uchastnikov-intellektualnoj-igryi-%C2%ABbrejn-ring%C2%BB,-posvyashhennoj-dnyu-oruzhejnika",
+        "total_attendance": 6,
+        "sms_attendance": 6,
+        "attendance_source": "user-provided team attendance; not whole intellectual tournament"
+      },
+      "website_import": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
       }
     }
   ],
@@ -672,13 +984,15 @@
       "layout_template": "Saved Q3 PPTX; original reference files are not present in this checkout.",
       "pending": [
         "Подтвержденная численность активных участников СМС на титульном слайде.",
-        "Дата, организатор и численность участников из СМС для «Гонки героев».",
-        "Организатор сплава.",
-        "Дата участия команды «ЭвоКом» в ночном старте.",
         "Полный состав организаторов «Брейн-ринга»: подтверждена только содействующая роль СоюзМаш.",
         "Предложения плана на IV квартал 2026 года не утверждены пользователем."
       ],
-      "assembly": "PPTX и PDF пересобраны тем же модулем, который используется кнопкой «Обновить» на сайте."
+      "assembly": "Обновлено по пользовательской выгрузке сайта от 15 октября 2026 года, 17:11:50 UTC.",
+      "source_export": {
+        "type": "user website export",
+        "file": "presentations/2026-Q3/imports/sms-2026-Q3-20261015-171150.json",
+        "exported_at": "2026-10-15T17:11:50+00:00"
+      }
     }
   }
 }

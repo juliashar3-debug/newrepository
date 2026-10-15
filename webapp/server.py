@@ -265,7 +265,7 @@ class Journal:
                               'description': photo.get('description', ''),
                               'group': photo.get('collage_position') == 'center'})
             count_source = str(source.get('attendance_source', ''))
-            sms_source = str(source.get('sms_attendance_source', ''))
+            sms_source = source.get('sms_attendance_source')
             visible = source.get('visible_people_count')
             total = source.get('total_attendance')
             total_type = 'confirmed'
@@ -275,7 +275,11 @@ class Journal:
                 total_type = 'calculated'
             elif 'Visual count' in count_source:
                 total_type = 'photo'
-            sms_type = 'calculated' if source.get('sms_attendance_source') else 'confirmed'
+            sms_type = 'confirmed'
+            if isinstance(sms_source, dict):
+                sms_type = sms_source.get('type') or ('calculated' if sms_source.get('formula') else 'confirmed')
+                if sms_type not in ['confirmed','calculated']:
+                    sms_type = 'confirmed'
             formula = source.get('attendance_rules', {})
             document = {
                 'id': source['id'], 'name': source['name'],
@@ -287,11 +291,11 @@ class Journal:
                 'sms_attendance': source.get('sms_attendance'),
                 'total_attendance': total, 'sms_type': sms_type, 'total_type': total_type,
                 'formula': '; '.join(f'{k}: {v}' for k,v in formula.items() if k in ['total','sms']) or
-                           (source.get('sms_attendance_source') or {}).get('formula', ''),
-                'notes': ('Нужно уточнить дату участия команды в ночном старте. В программе ночные 5 км — 22 августа, дневные 5 и 10 км — 23 августа 2026 года.'
+                           (sms_source.get('formula', '') if isinstance(sms_source,dict) else ''),
+                'notes': source.get('website_notes', ('Нужно уточнить дату участия команды в ночном старте. В программе ночные 5 км — 22 августа, дневные 5 и 10 км — 23 августа 2026 года.'
                           if source['id'] == 'evocom_5_10km' else '') or
                          ('Подтверждено содействие в организации; полный состав организаторов не установлен.'
-                          if source['id'] == 'museum_quiz_2026_09_17' else ''),
+                          if source['id'] == 'museum_quiz_2026_09_17' else '')),
                 'include': source.get('inclusion_status') != 'excluded_by_user',
                 'photos': saved, 'source': source,
             }

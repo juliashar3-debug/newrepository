@@ -68,12 +68,21 @@ class JournalIntegrationTests(unittest.TestCase):
     def test_initial_import_keeps_scope_and_sources(self):
         active=[e for e in self.journal.events() if e['include'] and e['quarter']=='2026-Q3']
         self.assertEqual(len(active),8)
-        self.assertEqual(sum(bool(e['issues']) for e in active),3)
+        self.assertEqual(sum(bool(e['issues']) for e in active),0)
         self.assertTrue(all(any(p['group'] for p in e['photos']) for e in active))
         exported=self.journal.export('2026-Q3')
         night=next(e for e in exported['events'] if e['id']=='night_tula_run')
         self.assertIn('rounded',night['sms_attendance_source'])
         self.assertFalse(next(e for e in self.journal.events() if e['id']=='relay_autumn')['include'])
+
+    def test_confirmed_website_update_keeps_counts_and_resolved_dates(self):
+        hero=self.journal.event('hero_race')
+        self.assertEqual((hero['date'],hero['total_attendance'],hero['sms_attendance']),('2026-09-05',20,19))
+        self.assertEqual(hero['sms_type'],'confirmed')
+        self.assertFalse(hero['issues'])
+        evocom=self.journal.event('evocom_5_10km')
+        self.assertEqual((evocom['date'],evocom['date_end']),('2026-08-22','2026-08-23'))
+        self.assertEqual(evocom['notes'],'')
 
     def test_new_record_survives_restart_and_rejects_invalid_counts(self):
         event=self.create()

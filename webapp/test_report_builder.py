@@ -30,6 +30,10 @@ class ReportBuilderIntegrationTests(unittest.TestCase):
             Image.new('RGB',(120,80),'#1279a2').save(stream,'PNG')
             uploaded=journal.upload(new['id'],stream.getvalue(),'new-group.png')
             snapshot=journal.report_snapshot('2026-Q3')
+            for card in snapshot['events']:
+                cached=card.setdefault('source',{}).setdefault('report_content',{})
+                cached['sms_attendance_display']=f"{card.get('sms_attendance')} человек (расчетно: старое пояснение)"
+                cached['team_attendance_display']=f"{card.get('total_attendance')} человек (по фото команды)"
             result=report_builder.build(snapshot,Path(temporary)/'output')
             presentation=Presentation(Path(temporary)/'output/report.pptx')
             pdf=PdfReader(Path(temporary)/'output/report.pdf')
@@ -38,6 +42,13 @@ class ReportBuilderIntegrationTests(unittest.TestCase):
             self.assertEqual(len(presentation.slides),len(pdf.pages))
             self.assertEqual(result['event_count'],7)
             self.assertGreater(result['slide_count'],10)  # long description continues
+            # Even existing cached report_content can contain old count qualifiers.
+            # Check the actual rendered fields on every event and continuation slide.
+            for slide in presentation.slides:
+                shapes=list(slide.shapes)
+                for index,shape in enumerate(shapes[:-1]):
+                    if shape.has_text_frame and shape.text in ['Количество участников из СМС:','Общее количество участников команды:']:
+                        self.assertRegex(shapes[index+1].text,r'^(?:\d+|—) человек(?:а)?$')
             for value in ['Обновленный кубок дракона','Совет ЦКБА','Новая встреча молодежи','18 человек']:
                 self.assertIn(value,text)
                 self.assertIn(value,pdftext)

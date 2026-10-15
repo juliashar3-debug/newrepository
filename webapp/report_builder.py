@@ -152,20 +152,20 @@ def clone_slide(presentation, source):
     return slide
 
 
-def attendance(event, field, kind):
+def attendance(event, field):
     value = event.get(field)
     if value is None:
         return '— человек'
-    qualifier = {'calculated': 'расчетно', 'photo': 'по фото команды'}.get(event.get(kind))
-    return f'{value} человек' + (f' ({qualifier})' if qualifier else '')
+    word = 'человека' if not 11 <= value % 100 <= 14 and value % 10 in [2,3,4] else 'человек'
+    return f'{value} {word}'
 
 
 def content(event):
     source = event.get('source', {})
     prior = source.get('report_content', {})
     values = [event['name'], event['description'] or '—', event['organizer'] or '—',
-              attendance(event, 'sms_attendance', 'sms_type'),
-              attendance(event, 'total_attendance', 'total_type'), event['effect'] or '—']
+              attendance(event, 'sms_attendance'),
+              attendance(event, 'total_attendance'), event['effect'] or '—']
     comparisons = [event['name'] == source.get('name'),
                    event['description'] == source.get('description_draft') and
                    event['date'] == (source.get('date') or '') and event['date_end'] == (source.get('date_end') or ''),
@@ -174,7 +174,7 @@ def content(event):
                    event.get('total_attendance') == (source.get('total_attendance') if source.get('total_attendance') is not None else source.get('visible_people_count')) and not event.get('dirty'),
                    event['effect'] == source.get('effect_draft')]
     for index, key in enumerate(['name', 'description', 'organizer_display', 'sms_attendance_display', 'team_attendance_display', 'effect']):
-        if comparisons[index] and key in prior:
+        if index not in (3,4) and comparisons[index] and key in prior:
             values[index] = prior[key]
     if not comparisons[1]:
         dates = event['date'] or '—'

@@ -17,6 +17,7 @@ const paths = {
   image:'M3 3h18v18H3z m0 13 5-5 4 4 3-3 6 6 M8 7h.01',
   arrow:'M5 12h14 m-5-5 5 5-5 5', clock:'M12 8v4l3 2 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',
   menu:'M4 6h16 M4 12h16 M4 18h16', archive:'M3 3h18v5H3z M5 8v13h14V8 M10 12h4',
+  refresh:'M20 7v5h-5 M4 17v-5h5 M6.1 6a8 8 0 0 1 13 2l.9 4 M4 12l.9 4a8 8 0 0 0 13 2',
 };
 const icon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[name] || paths.report}"/></svg>`;
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -25,6 +26,7 @@ const titles = {events:'Мероприятия совета',report:'Кварт�
 const subtitles = {events:'Все события, фотографии и важные детали — в одном месте.',report:'Собранные материалы и готовая презентация за квартал.',plans:'Идеи, которые превращают прошедший опыт в следующие шаги.',help:'Добавляй материалы постепенно. Журнал поможет собрать их в отчет.'};
 const state = {events:[],meta:null,quarter:'2026-Q3',view:'events',filter:'all',search:'',editing:null,pending:[],removed:[],mainPhoto:'',saving:false,changed:false};
 let toastTimer;
+const reportPolls = new Map();
 
 function hydrateIcons(root = document) { $$('[data-icon]',root).forEach(el => { el.innerHTML = icon(el.dataset.icon); }); }
 function quarterLabel(value) { const [year,q] = value.split('-Q'); return `${roman[Number(q)] || q} квартал ${year}`; }
@@ -53,6 +55,7 @@ async function load() {
     $('#quarter-select').value = state.quarter; $('#quarter-select').dataset.loaded = '1';
     $('#connection').innerHTML = '<i></i>На этом компьютере';
     render();
+    meta.reports.filter(report => report.job?.state === 'running').forEach(report => watchReport(report.quarter));
   } catch (e) {
     error.textContent = `${e.message} Обновите страницу после запуска сервера.`; error.hidden = false;
     $('#connection').textContent = 'Нет соединения';
@@ -80,10 +83,53 @@ function render() {
   $('#period-label').textContent = `${['','Январь — март','Апрель — июнь','Июль — сентябрь','Октябрь — декабрь'][q]} ${state.quarter.slice(0,4)}`;
   $$('.nav-item').forEach(el => el.classList.toggle('active',el.dataset.view === state.view));
   $$('.view').forEach(el => el.hidden = el.id !== `${state.view}-view`);
+  renderReportPrompt();
   if (state.view === 'events') renderEvents();
   else if (state.view === 'report') renderReport();
   else if (state.view === 'plans') renderPlans();
   else renderHelp();
+}
+function reportUpdateButton(report) {
+  const running = report?.job?.state === 'running';
+  return `<button class="button primary" data-report-update ${running ? 'disabled aria-busy="true"' : ''}>${icon('refresh')}${running ? 'Обновляем…' : 'Обновить'}</button>`;
+}
+function renderReportPrompt() {
+  const report = state.meta.reports.find(item => item.quarter === state.quarter);
+  const prompt = $('#report-update-prompt');
+  const running = report?.job?.state === 'running';
+  prompt.hidden = state.view === 'report' || (!report?.changed && !running);
+  prompt.innerHTML = `<div><strong>${running ? 'Обновляем презентацию и PDF' : 'Обновить презентацию и PDF?'}</strong><p>${running ? esc(report.job.message) : 'Мероприятия изменились после сборки отчета. Сохраненные правки готовы к переносу в оба файла.'}</p></div>${reportUpdateButton(report)}`;
+}
+async function updateReport() {
+  const quarter = state.quarter;
+  try {
+    const status = await api('/api/report/rebuild',{method:'POST',body:JSON.stringify({quarter})});
+    const report = state.meta.reports.find(item => item.quarter === quarter);
+    if (report) report.job = status;
+    state.view = 'report'; render(); watchReport(quarter);
+  } catch (error) { notify(error.message,true); }
+}
+function watchReport(quarter) {
+  if (reportPolls.has(quarter)) return;
+  const tick = async () => {
+    try {
+      const status = await api(`/api/report/status?quarter=${encodeURIComponent(quarter)}`);
+      const report = state.meta?.reports.find(item => item.quarter === quarter);
+      if (report) report.job = status;
+      if (status.state === 'running') {
+        if (state.quarter === quarter) render();
+        reportPolls.set(quarter,setTimeout(tick,1000));
+      } else {
+        reportPolls.delete(quarter);
+        await load();
+        notify(status.state === 'success' ? 'Презентация и PDF обновлены. Можно скачать новые файлы.' : status.message || 'Обновление прервано. Повторите сборку.',status.state !== 'success');
+      }
+    } catch (error) {
+      reportPolls.delete(quarter);
+      notify(`${error.message} Обновите страницу, чтобы проверить готовность отчета.`,true);
+    }
+  };
+  reportPolls.set(quarter,setTimeout(tick,500));
 }
 function renderEvents() {
   const events = selectedEvents();
@@ -117,7 +163,9 @@ function renderReport() {
   const events = sorted(selectedEvents());
   const missing = events.filter(e => e.issues.length);
   const fmt = type => `/api/report?quarter=${encodeURIComponent(state.quarter)}&format=${type}`;
-  $('#report-view').innerHTML = `<section class="panel report-hero"><div><p class="eyebrow">${esc(quarterLabel(state.quarter).toUpperCase())}</p><h2>${report ? 'Отчет уже собран' : 'Материалы будущего отчета'}</h2><p>${report ? `${report.slide_count} слайдов · ${report.event_count} мероприятий. Готовые файлы доступны ниже.` : 'Накапливайте мероприятия и фотографии. Когда квартал закончится, выгрузите материалы для сборки презентации.'}</p><div class="button-row">${report?.available.pdf ? `<a class="button primary" href="${fmt('pdf')}">${icon('report')}Скачать PDF</a>` : ''}${report?.available.pptx ? `<a class="button secondary" href="${fmt('pptx')}">${icon('download')}Скачать PPTX</a>` : ''}<a class="button ${report ? 'secondary' : 'primary'}" href="/api/export.zip?quarter=${encodeURIComponent(state.quarter)}">${icon('download')}Материалы квартала · ZIP</a></div>${report?.changed ? `<p class="muted-note">В ${report.changed} карточках есть изменения после сборки. Передайте агенту новую выгрузку, чтобы обновить презентацию.</p>` : ''}</div><div class="report-icon">${icon('report')}</div></section><div class="banner info">Готовая презентация обновляется при сборке отчета агентом. Сохранение карточки меняет журнал; уже собранные PPTX и PDF сохраняют свою версию.</div><section class="panel"><h2>Войдут в отчет</h2><p>${events.length} мероприятий · ${missing.length ? `${missing.length} карточки требуют уточнения` : 'основные поля заполнены'}</p>${events.length ? `<ol class="report-list">${events.map((e,i) => `<li><span class="order-number">${i+1}</span><span>${esc(e.name)}</span><span class="status ${e.issues.length ? 'amber' : 'green'}">${e.issues.length ? esc(e.issues.join(', ')) : 'Готово'}</span></li>`).join('')}</ol>` : '<p>Пока нет мероприятий, отмеченных для включения.</p>'}</section>`;
+  const running = report?.job?.state === 'running';
+  const updated = report?.updated_at ? new Date(report.updated_at).toLocaleString('ru-RU') : report?.updated_date;
+  $('#report-view').innerHTML = `<section class="panel report-hero" aria-busy="${running}"><div><p class="eyebrow">${esc(quarterLabel(state.quarter).toUpperCase())}</p><h2>${running ? 'Обновляем отчет' : report?.changed ? 'В отчете есть новые изменения' : report ? 'Отчет готов к скачиванию' : 'Материалы будущего отчета'}</h2><p>${report ? `${report.slide_count} слайдов · ${report.event_count} мероприятий в последней сборке.${updated ? ` Обновлено: ${esc(updated)}.` : ''}` : 'Добавляйте мероприятия и фотографии. Для первой сборки квартала подготовьте шаблон вместе с агентом.'}</p><div class="button-row">${report ? reportUpdateButton(report) : ''}${report?.available.pdf ? `<a class="button secondary" href="${fmt('pdf')}">${icon('report')}Скачать PDF</a>` : ''}${report?.available.pptx ? `<a class="button secondary" href="${fmt('pptx')}">${icon('download')}Скачать PPTX</a>` : ''}<a class="button secondary" href="/api/export.zip?quarter=${encodeURIComponent(state.quarter)}">${icon('download')}Материалы квартала · ZIP</a></div>${running ? `<p class="build-progress" role="status">${icon('refresh')}${esc(report.job.message)} Предыдущие файлы доступны до окончания обновления.</p>` : report?.changed ? '<p class="muted-note">Мероприятия изменены. Нажмите «Обновить», чтобы перенести сохраненные правки в презентацию и PDF.</p>' : report ? '<p class="muted-note">Презентация и PDF соответствуют сохраненным мероприятиям.</p>' : ''}${report?.job?.state === 'error' ? `<div class="banner error" role="alert">${esc(report.job.message)}</div>` : ''}</div><div class="report-icon">${icon('report')}</div></section>${report && !state.meta.report_builder?.ready ? `<div class="banner info">${esc(state.meta.report_builder?.message)} <a href="https://www.libreoffice.org/download/download-libreoffice/" target="_blank" rel="noopener">Скачать LibreOffice</a></div>` : ''}<section class="panel"><h2>Войдут в отчет</h2><p>${events.length} мероприятий · ${missing.length ? `${missing.length} карточки требуют уточнения` : 'основные поля заполнены'}</p>${events.length ? `<ol class="report-list">${events.map((e,i) => `<li><span class="order-number">${i+1}</span><span>${esc(e.name)}</span><span class="status ${e.issues.length ? 'amber' : 'green'}">${e.issues.length ? esc(e.issues.join(', ')) : 'Готово'}</span></li>`).join('')}</ol>` : '<p>Пока нет мероприятий, отмеченных для включения.</p>'}</section>`;
 }
 function renderPlans() {
   const plan = state.meta.plans.find(p => p.report_quarter === state.quarter);
@@ -125,7 +173,7 @@ function renderPlans() {
   $('#plans-view').innerHTML = `<div class="banner info">Предложения на ${esc(quarterLabel(plan.target_quarter))}. План пока не утвержден.</div><div class="plan-grid">${plan.goals_and_tasks.map((p,i) => `<article class="panel plan-card"><span class="plan-number">0${i+1}</span><p class="eyebrow">ЦЕЛЬ</p><h2>${esc(p.goal)}</h2><div class="task"><p class="eyebrow">КОНКРЕТНАЯ ЗАДАЧА</p><p>${esc(p.task)}</p></div></article>`).join('')}</div>`;
 }
 function renderHelp() {
-  $('#help-view').innerHTML = `<div class="help-grid"><section class="panel"><div class="help-number">ШАГ 01</div><h2>Расскажи о событии</h2><p>Укажи название, дату, организатора и коротко опиши участие команды. Неизвестные сведения можно оставить пустыми и дополнить позже.</p></section><section class="panel"><div class="help-number">ШАГ 02</div><h2>Добавь фотографии</h2><p>Загрузи снимки и выбери общее фото — для центра коллажа. Сохраняются оригиналы. Число одних и тех же людей на разных снимках не складываем.</p></section><section class="panel"><div class="help-number">ШАГ 03</div><h2>Собери материалы квартала</h2><p>Открой раздел «Квартальный отчет» и скачай архив материалов. Передай его агенту для сборки или обновления презентации по сохраненному оформлению.</p></section></div><section class="panel"><h2>Что важно при заполнении</h2><p>Численность относится к команде ЦКБА. Для расчетных значений выбирай отметку «Расчетное число» и записывай формулу. При неизвестной дате выбери квартал вручную. Если дата указана, квартал определяется по ней.</p><p>Журнал хранится на компьютере, где запущен сервер. Вход через Интернет в этой версии не настроен. Исходные материалы репозитория не перезаписываются: для передачи изменений используй «Выгрузить журнал» или архив квартала.</p><p>Восстановить карточку из архива можно через фильтр «Архив». Удаление снимка из карточки не стирает исходный файл.</p></section>`;
+  $('#help-view').innerHTML = `<div class="help-grid"><section class="panel"><div class="help-number">ШАГ 01</div><h2>Расскажи о событии</h2><p>Укажи название, дату, организатора и коротко опиши участие команды. Неизвестные сведения можно оставить пустыми и дополнить позже.</p></section><section class="panel"><div class="help-number">ШАГ 02</div><h2>Добавь фотографии</h2><p>Загрузи снимки и выбери общее фото — для центра коллажа. Сохраняются оригиналы. Число одних и тех же людей на разных снимках не складываем.</p></section><section class="panel"><div class="help-number">ШАГ 03</div><h2>Обнови отчет</h2><p>После сохранения карточки журнал предложит обновить презентацию и PDF. Нажми «Обновить» и дождись завершения. Оба новых файла появятся в разделе «Квартальный отчет».</p></section></div><section class="panel"><h2>Что важно при заполнении</h2><p>Численность относится к команде ЦКБА. Для расчетных значений выбирай отметку «Расчетное число» и записывай формулу. При неизвестной дате выбери квартал вручную. Если дата указана, квартал определяется по ней.</p><p>Сборка сохраняет оформление отчета, общий снимок в центре и неизвестные числа прочерками. Для создания PDF нужен LibreOffice или Microsoft PowerPoint в Windows. Длинный текст продолжается на дополнительных слайдах.</p><p>Журнал и новые версии отчета хранятся на компьютере, где запущен сервер. Если редактировать карточки во время сборки, журнал предложит обновить отчет еще раз. Для передачи агенту используй выгрузку журнала или архив квартала.</p><p>Восстановить карточку из архива можно через фильтр «Архив». Удаление снимка из карточки не стирает исходный файл.</p></section>`;
 }
 function clearForm() {
   state.pending.forEach(p => URL.revokeObjectURL(p.url)); state.pending=[]; state.removed=[]; state.editing=null; state.mainPhoto=''; state.changed=false;
@@ -226,6 +274,7 @@ async function saveForm(event) {
 }
 
 hydrateIcons();
+document.addEventListener('click',event => { if (event.target.closest('[data-report-update]')) updateReport(); });
 $('#add-event').addEventListener('click',() => openForm());
 $('#close-form').addEventListener('click',() => closeForm());
 $('#cancel-form').addEventListener('click',() => closeForm());

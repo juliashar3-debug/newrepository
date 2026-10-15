@@ -4,8 +4,10 @@ from io import BytesIO
 import json
 from pathlib import Path
 import tempfile
+import threading
 from types import SimpleNamespace
 import unittest
+from unittest.mock import patch
 import zipfile
 
 from server import Handler, Journal
@@ -146,6 +148,84 @@ class JournalIntegrationTests(unittest.TestCase):
         self.assertEqual(status,200)
         self.assertIn('text/html',headers['Content-Type'])
         self.assertIn('Журнал мероприятий'.encode(),body)
+
+    def finish_build(self):
+        self.assertTrue(self.journal.report_lock.acquire(timeout=10), 'report worker did not finish')
+        self.journal.report_lock.release()
+
+    @staticmethod
+    def fake_build(snapshot, directory, stage):
+        directory.mkdir(parents=True)
+        (directory/'report.pdf').write_bytes(b'%PDF-new-report')
+        (directory/'report.pptx').write_bytes(b'new-presentation')
+        return {'slide_count':len(snapshot['events'])+3,'event_count':len(snapshot['events'])}
+
+    def test_report_changes_follow_membership_and_quarter_moves(self):
+        report=lambda: next(r for r in self.journal.metadata()['reports'] if r['quarter']=='2026-Q3')
+        self.assertEqual(report()['changed'],0)
+        event=self.journal.event('dragon_boat_cup')
+        self.journal.save(event['id'],{'revision':event['revision'],'date':'2026-10-15','quarter':'2026-Q4'})
+        self.assertEqual(report()['changed'],1)
+        self.journal.archive('hero_race',True)
+        self.assertEqual(report()['changed'],2)
+        self.journal.archive('hero_race',False)
+        self.assertEqual(report()['changed'],1)
+
+    def test_report_pair_is_persistent_and_no_longer_stale_after_build(self):
+        event=self.journal.event('dragon_boat_cup')
+        self.journal.save(event['id'],{'revision':event['revision'],'sms_attendance':18})
+        with patch('report_builder.capabilities',return_value={'ready':True}), patch('report_builder.build',side_effect=self.fake_build):
+            self.assertEqual(self.request('/api/report/rebuild',{'quarter':'2026-Q3'})[0],202)
+            self.finish_build()
+        self.assertEqual(self.journal.report_status('2026-Q3')['state'],'success')
+        report=next(r for r in self.journal.metadata()['reports'] if r['quarter']=='2026-Q3')
+        self.assertEqual(report['changed'],0)
+        self.assertEqual(self.request('/api/report?quarter=2026-Q3&format=pdf')[2],b'%PDF-new-report')
+        self.assertEqual(self.request('/api/report?quarter=2026-Q3&format=pptx')[2],b'new-presentation')
+        reopened=Journal(self.temp.name)
+        self.assertEqual(reopened.report_path('2026-Q3','pdf').read_bytes(),b'%PDF-new-report')
+
+    def test_failed_build_retains_previous_pair_and_unsaved_report_changes(self):
+        original=self.journal.report_path('2026-Q3','pdf')
+        self.journal.archive('hero_race',True)
+        with patch('report_builder.capabilities',return_value={'ready':True}), patch('report_builder.build',side_effect=ValueError('Ошибка преобразования PDF')):
+            self.journal.rebuild_report('2026-Q3')
+            self.finish_build()
+        self.assertEqual(self.journal.report_path('2026-Q3','pdf'),original)
+        self.assertEqual(self.journal.report_status('2026-Q3')['state'],'error')
+        self.assertEqual(next(r for r in self.journal.metadata()['reports'] if r['quarter']=='2026-Q3')['changed'],1)
+
+    def test_edits_during_build_stay_pending_and_duplicate_start_is_idempotent(self):
+        entered=threading.Event()
+        release=threading.Event()
+        def delayed(snapshot,directory,stage):
+            entered.set()
+            if not release.wait(5):
+                raise ValueError('test timeout')
+            return self.fake_build(snapshot,directory,stage)
+        try:
+            with patch('report_builder.capabilities',return_value={'ready':True}), patch('report_builder.build',side_effect=delayed) as builder:
+                self.journal.rebuild_report('2026-Q3')
+                self.assertTrue(entered.wait(3))
+                self.assertEqual(self.journal.rebuild_report('2026-Q3')['state'],'running')
+                self.assertEqual(builder.call_count,1)
+                event=self.journal.event('dragon_boat_cup')
+                self.journal.save(event['id'],{'revision':event['revision'],'sms_attendance':18})
+                release.set()
+                self.finish_build()
+        finally:
+            release.set()
+        self.assertEqual(next(r for r in self.journal.metadata()['reports'] if r['quarter']=='2026-Q3')['changed'],1)
+
+    def test_rebuild_rejects_cross_site_and_invalid_inputs(self):
+        self.assertEqual(self.request('/api/report/rebuild',{'quarter':'2026-Q3'},{'Origin':'https://example.org'})[0],403)
+        self.assertEqual(self.request('/api/report/rebuild',{'quarter':'../../x'})[0],400)
+        self.assertEqual(self.request('/api/report/rebuild',{'quarter':[]})[0],400)
+        self.assertEqual(self.request('/api/report/rebuild',{'quarter':'2028-Q2'})[0],400)
+        with patch('report_builder.capabilities',return_value={'ready':False,'message':'Установите LibreOffice'}):
+            status,_,data=self.request('/api/report/rebuild',{'quarter':'2026-Q3'})
+        self.assertEqual(status,400)
+        self.assertIn('LibreOffice',json.loads(data)['error'])
 
 
 if __name__=='__main__':

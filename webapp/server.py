@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Single-owner local event journal. No third-party packages are required."""
+"""Single-owner local event journal with optional installed report generation tools."""
 from __future__ import annotations
 
 import argparse
@@ -11,12 +11,16 @@ from pathlib import Path
 import re
 import sqlite3
 import tempfile
+import threading
+import shutil
 from datetime import date, datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlsplit
 from uuid import uuid4
 import zipfile
 from contextlib import contextmanager
+
+import report_builder
 
 ROOT = Path(__file__).resolve().parents[1]
 STATIC = Path(__file__).resolve().parent / 'static'
@@ -44,9 +48,12 @@ def inspect_image(data):
 
 class Journal:
     def __init__(self, directory):
+        self.report_lock = threading.Lock()
+        self.jobs_lock = threading.Lock()
+        self.report_jobs = {}
         self.directory = Path(directory).resolve()
         self.directory.mkdir(parents=True, exist_ok=True)
-        for folder in ['uploads', 'thumbnails', 'exports']:
+        for folder in ['uploads', 'thumbnails', 'exports', 'reports']:
             (self.directory / folder).mkdir(exist_ok=True)
         self.path = self.directory / 'journal.sqlite3'
         with self.db() as conn:
@@ -69,6 +76,140 @@ class Journal:
             ''')
             if not conn.execute("SELECT 1 FROM settings WHERE key='initialized'").fetchone():
                 self.seed(conn)
+            if not conn.execute("SELECT 1 FROM settings WHERE key='report_baselines'").fetchone():
+                journal = json.loads(conn.execute("SELECT value FROM settings WHERE key='journal'").fetchone()[0])
+                rows = conn.execute('SELECT * FROM events').fetchall()
+                baselines = {}
+                for quarter in journal.get('reports', {}):
+                    baselines[quarter] = self.signatures(rows, quarter)
+                    # A database from the previous site may already contain unbuilt edits.
+                    for row in rows:
+                        doc = json.loads(row['document'])
+                        if row['dirty'] and doc['quarter'] == quarter:
+                            baselines[quarter][doc['id']] = 'not-yet-built'
+                self.setting(conn, 'report_baselines', baselines)
+
+    @staticmethod
+    def setting(conn, key, value):
+        conn.execute('INSERT OR REPLACE INTO settings VALUES (?,?)',
+                     (key, json.dumps(value, ensure_ascii=False)))
+
+    @staticmethod
+    def signatures(rows, quarter):
+        result = {}
+        for row in rows:
+            doc = json.loads(row['document'])
+            if doc['quarter'] != quarter or row['archived'] or not doc['include']:
+                continue
+            material = {key: value for key, value in doc.items() if key != 'source'}
+            result[doc['id']] = hashlib.sha256(json.dumps(material, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+        return result
+
+    def report_status(self, quarter):
+        with self.jobs_lock:
+            return dict(self.report_jobs.get(quarter, {'state': 'idle', 'message': ''}))
+
+    def report_snapshot(self, quarter):
+        if not re.fullmatch(r'\d{4}-Q[1-4]', quarter):
+            raise ValueError('Неверный квартал.')
+        with self.db() as conn:
+            conn.execute('BEGIN')
+            settings = {row['key']: json.loads(row['value']) for row in conn.execute('SELECT * FROM settings')}
+            journal = settings['journal']
+            report = journal.get('reports', {}).get(quarter)
+            if not report:
+                raise ValueError('Для этого квартала сначала нужен оформленный шаблон отчета. Сейчас обновление доступно для III квартала 2026 года.')
+            template = (ROOT / report['pptx']).resolve()
+            if not template.is_relative_to(ROOT) or not template.is_file():
+                raise ValueError('Шаблон презентации не найден. Скачайте репозиторий полностью.')
+            rows = conn.execute('SELECT * FROM events').fetchall()
+            fingerprints = self.signatures(rows, quarter)
+            events = []
+            for row in rows:
+                doc = json.loads(row['document'])
+                if doc['id'] in fingerprints:
+                    doc['revision'] = row['revision']
+                    doc['dirty'] = bool(row['dirty'])
+                    events.append(doc)
+            order = journal.get('report_order', {}).get(quarter, [])
+            events.sort(key=lambda event: (order.index(event['id']) if event['id'] in order else len(order),
+                                           event['date'] or '9999', event['id']))
+            files = {}
+            for event in events:
+                for photo in event['photos']:
+                    row = conn.execute('SELECT * FROM files WHERE id=?', (photo['id'],)).fetchone()
+                    if not row or not Path(row['path']).is_file():
+                        raise ValueError('Не найдена фотография «' + photo['name'] + '». Скачайте все материалы или загрузите снимок заново.')
+                    path = Path(row['path'])
+                    files[photo['id']] = {**dict(row), 'repository_path': str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else None}
+        return {'quarter': quarter, 'template': str(template), 'events': events,
+                'files': files, 'fingerprints': fingerprints}
+
+    def rebuild_report(self, quarter):
+        if not self.report_lock.acquire(blocking=False):
+            current = self.report_status(quarter)
+            if current['state'] == 'running':
+                return current
+            raise RuntimeError('Уже обновляется другой отчет. Дождитесь окончания сборки.')
+        try:
+            snapshot = self.report_snapshot(quarter)
+            ready = report_builder.capabilities()
+            if not ready['ready']:
+                raise ValueError(ready['message'])
+            with self.jobs_lock:
+                self.report_jobs[quarter] = {'state': 'running', 'message': 'Подготавливаем отчет…'}
+            worker = threading.Thread(target=self._build_report, args=(snapshot,), daemon=True)
+            worker.start()
+            return self.report_status(quarter)
+        except Exception:
+            self.report_lock.release()
+            raise
+
+    def _build_report(self, snapshot):
+        quarter = snapshot['quarter']
+        directory = self.directory / 'reports' / quarter / uuid4().hex
+        def stage(message):
+            with self.jobs_lock:
+                self.report_jobs[quarter] = {'state': 'running', 'message': message}
+        try:
+            built = report_builder.build(snapshot, directory, stage)
+            # Publish a single pointer to the completed pair; failed builds never replace downloads.
+            with self.db() as conn:
+                conn.execute('BEGIN IMMEDIATE')
+                settings = {row['key']: json.loads(row['value']) for row in conn.execute('SELECT * FROM settings')}
+                generated = settings.get('generated_reports', {})
+                generated[quarter] = {**built, 'pdf': str((directory / 'report.pdf').relative_to(self.directory)),
+                                      'pptx': str((directory / 'report.pptx').relative_to(self.directory)),
+                                      'updated_at': now(), 'updated_date': datetime.now().astimezone().date().isoformat()}
+                baselines = settings.get('report_baselines', {})
+                baselines[quarter] = snapshot['fingerprints']
+                self.setting(conn, 'generated_reports', generated)
+                self.setting(conn, 'report_baselines', baselines)
+            with self.jobs_lock:
+                self.report_jobs[quarter] = {'state': 'success', 'message': 'Презентация и PDF обновлены.'}
+        except Exception as exc:
+            shutil.rmtree(directory, ignore_errors=True)
+            message = str(exc) if isinstance(exc, (report_builder.BuildError, ValueError)) else 'Не удалось собрать отчет. Предыдущие файлы сохранены; повторите обновление.'
+            with self.jobs_lock:
+                self.report_jobs[quarter] = {'state': 'error', 'message': message}
+        finally:
+            self.report_lock.release()
+
+    def report_path(self, quarter, kind):
+        if kind not in ['pdf', 'pptx']:
+            raise ValueError('Неизвестный формат отчета.')
+        with self.db() as conn:
+            settings = {row['key']: json.loads(row['value']) for row in conn.execute('SELECT * FROM settings')}
+        generated = settings.get('generated_reports', {}).get(quarter)
+        base = self.directory if generated else ROOT
+        report = generated or settings['journal'].get('reports', {}).get(quarter, {})
+        relative = report.get(kind)
+        if not relative:
+            raise KeyError('Для этого квартала еще нет готового отчета.')
+        target = (base / relative).resolve()
+        if not target.is_relative_to(base) or not target.is_file():
+            raise KeyError('Файл отчета недоступен.')
+        return target
 
     @contextmanager
     def db(self):
@@ -312,23 +453,34 @@ class Journal:
     def metadata(self):
         with self.db() as conn:
             settings={r['key']:json.loads(r['value']) for r in conn.execute('SELECT * FROM settings')}
+            rows=conn.execute('SELECT * FROM events').fetchall()
         journal=settings['journal']
         events=self.events()
         quarters=sorted({e['quarter'] for e in events}|{'2026-Q3','2026-Q4','2027-Q1'},reverse=True)
         reports=[]
         for quarter, report in journal.get('reports',{}).items():
-            available={kind:bool(report.get(kind) and (ROOT/report[kind]).is_file()) for kind in ['pdf','pptx']}
-            reports.append({**{k:report.get(k) for k in ['slide_count','event_count','updated_date','pending']},
+            generated=settings.get('generated_reports',{}).get(quarter)
+            current=generated or report
+            base=self.directory if generated else ROOT
+            available={kind:bool(current.get(kind) and (base/current[kind]).is_file()) for kind in ['pdf','pptx']}
+            before=settings.get('report_baselines',{}).get(quarter,{})
+            after=self.signatures(rows,quarter)
+            changed=sum(before.get(key)!=after.get(key) for key in before.keys()|after.keys())
+            reports.append({**{k:current.get(k) for k in ['slide_count','event_count','updated_date','updated_at']},
+                            'pending':report.get('pending',[]), 'job':self.report_status(quarter),
                             'quarter':quarter,'available':available,
-                            'changed':sum(e['dirty'] for e in events if e['quarter']==quarter)})
+                            'changed':changed})
         return {'quarters':quarters,'default_quarter':journal.get('report_defaults',{}).get('report_period','2026-Q3'),
                 'reports':reports,'plans':settings['plans']['plans'],
-                'order':journal.get('report_order',{}),'local_only':True}
+                'order':journal.get('report_order',{}),'local_only':True,
+                'report_builder':report_builder.capabilities()}
 
     def export(self,quarter):
         with self.db() as conn:
             rows=conn.execute('SELECT * FROM events WHERE archived=0').fetchall()
             original=json.loads(conn.execute("SELECT value FROM settings WHERE key='journal'").fetchone()[0])
+            baselines=json.loads(conn.execute("SELECT value FROM settings WHERE key='report_baselines'").fetchone()[0])
+        current_signatures=self.signatures(rows,quarter)
         result={k:v for k,v in original.items() if k not in ['events','report_order']}
         result['events']=[]
         for row in rows:
@@ -338,13 +490,14 @@ class Journal:
             event=dict(doc.get('source',{}))
             for old in ['report_content','report_slide']:
                 event.pop(old,None)
+            built=baselines.get(quarter,{}).get(doc['id'])==current_signatures.get(doc['id']) and doc['include']
             event.update(id=doc['id'],name=doc['name'],date=doc['date'] or None,
                          date_end=doc['date_end'] or None,reported_quarter=doc['quarter'],
                          organizer=doc['organizer'] or None,description_draft=doc['description'],
                          effect_draft=doc['effect'],sms_attendance=doc['sms_attendance'],
                          total_attendance=doc['total_attendance'],planned_for_report=doc['include'],
-                         included_in_current_report=bool(not row['dirty'] and doc['include']),
-                         inclusion_status='planned; website changes pending report assembly' if row['dirty'] else event.get('inclusion_status','planned'),
+                         included_in_current_report=bool(built),
+                         inclusion_status='included_in_draft' if built else 'planned; website changes pending report assembly' if doc['include'] else 'excluded_by_user',
                          website_notes=doc['notes'],
                          attendance_source={'type':doc['total_type'],'source':'website entry','formula':doc['formula']},
                          sms_attendance_source={'type':doc['sms_type'],'source':'website entry','formula':doc['formula']},
@@ -431,6 +584,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send(200,{'events':self.journal.events()})
             if path.path=='/api/meta':
                 return self.send(200,self.journal.metadata())
+            if path.path=='/api/report/status':
+                return self.send(200,self.journal.report_status(quarter))
             if path.path in ['/api/export','/api/export.zip']:
                 if not re.fullmatch(r'\d{4}-Q[1-4]',quarter):
                     raise ValueError('Неверный квартал.')
@@ -455,17 +610,7 @@ class Handler(BaseHTTPRequestHandler):
                     temp.unlink(missing_ok=True)
             if path.path=='/api/report':
                 kind=query.get('format',['pdf'])[0]
-                if kind not in ['pdf','pptx']:
-                    raise ValueError('Неизвестный формат отчета.')
-                with self.journal.db() as conn:
-                    journal=json.loads(conn.execute("SELECT value FROM settings WHERE key='journal'").fetchone()[0])
-                rel=journal.get('reports',{}).get(quarter,{}).get(kind)
-                if not rel:
-                    raise KeyError('Для этого квартала еще нет готового отчета.')
-                target=(ROOT/rel).resolve()
-                if not target.is_relative_to(ROOT) or not target.is_file():
-                    raise KeyError('Файл отчета недоступен.')
-                return self.file(target,download=True)
+                return self.file(self.journal.report_path(quarter,kind),download=True)
             if path.path.startswith('/media/'):
                 fid=path.path.rsplit('/',1)[-1]
                 with self.journal.db() as conn:
@@ -520,6 +665,11 @@ class Handler(BaseHTTPRequestHandler):
             payload=json.loads(self.body())
             if not isinstance(payload,dict):
                 raise ValueError('Некорректные данные формы.')
+            if path=='/api/report/rebuild':
+                quarter=payload.get('quarter','')
+                if not isinstance(quarter,str):
+                    raise ValueError('Выберите отчетный квартал.')
+                return self.send(202,self.journal.rebuild_report(quarter))
             if path=='/api/events':
                 return self.send(201,self.journal.save(None,payload))
             edit=re.fullmatch(r'/api/events/([a-zA-Z0-9_-]+)',path)

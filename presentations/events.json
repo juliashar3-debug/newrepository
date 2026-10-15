@@ -230,15 +230,18 @@
       "photos": [
         {
           "repository_path": "presentations/2026-Q3/kayak/IMG_6413.jpeg",
-          "description": "Group on river bank with kayaks"
+          "description": "Group on river bank with kayaks",
+          "collage_position": "center"
         },
         {
           "repository_path": "presentations/2026-Q3/kayak/IMG_6528.jpeg",
-          "description": "Two participants in blue kayak"
+          "description": "Two participants in blue kayak",
+          "collage_position": "top"
         },
         {
           "repository_path": "presentations/2026-Q3/kayak/IMG_6534.jpeg",
-          "description": "Two participants in red kayak"
+          "description": "Two participants in red kayak",
+          "collage_position": "bottom"
         }
       ],
       "photos_access": "Original JPEG files supplied as accessible attachments; preserved in repository",
@@ -674,7 +677,8 @@
         "Дата участия команды «ЭвоКом» в ночном старте.",
         "Полный состав организаторов «Брейн-ринга»: подтверждена только содействующая роль СоюзМаш.",
         "Предложения плана на IV квартал 2026 года не утверждены пользователем."
-      ]
+      ],
+      "assembly": "PPTX и PDF пересобраны тем же модулем, который используется кнопкой «Обновить» на сайте."
     }
   }
 }

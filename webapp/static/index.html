@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#173e71">
   <title>СМС · Журнал мероприятий ЦКБА</title>
   <meta name="description" content="Личный журнал мероприятий Совета молодых специалистов АО ЦКБА: фотографии, участники и квартальные отчеты.">
-  <link rel="stylesheet" href="/style.css">
-  <script src="/app.js" defer></script>
+  <link rel="stylesheet" href="/style.css?v=20261015-2">
+  <script src="/app.js?v=20261015-2" defer></script>
 </head>
 <body>
   <div class="shell">
@@ -31,7 +31,7 @@
       </header>
       <main id="main" tabindex="-1">
         <div class="page-heading"><div><p class="eyebrow">СОВЕТ МОЛОДЫХ СПЕЦИАЛИСТОВ</p><h1 id="page-title">Мероприятия совета</h1><p id="page-subtitle">Все события, фотографии и важные детали — в одном месте.</p></div><button class="button primary" id="add-event"><span data-icon="plus"></span>Добавить мероприятие</button></div>
-        <div class="quarter-bar"><label class="quarter-select"><span data-icon="calendar"></span><select id="quarter-select" aria-label="Отчетный квартал"><option>Загрузка…</option></select><span data-icon="chevron"></span></label><span class="period-label" id="period-label"></span><button class="text-button" id="export-button"><span data-icon="download"></span>Выгрузить журнал</button></div>
+        <div class="quarter-bar"><label class="quarter-select"><span data-icon="calendar"></span><select id="quarter-select" aria-label="Отчетный квартал"><option>Загрузка…</option></select><span data-icon="chevron"></span></label><span class="period-label" id="period-label"></span><div class="quarter-actions"><button class="button primary" id="update-report" data-report-update disabled><span data-icon="refresh"></span>Обновить PPTX и PDF</button><button class="text-button" id="export-button"><span data-icon="download"></span>Выгрузить журнал</button></div></div>
         <div id="load-error" class="banner error" role="alert" hidden></div>
         <div id="report-update-prompt" class="banner info report-update-prompt" role="status" hidden></div>
         <section id="events-view" class="view">

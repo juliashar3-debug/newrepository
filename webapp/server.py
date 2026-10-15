@@ -88,6 +88,22 @@ class Journal:
                         if row['dirty'] and doc['quarter'] == quarter:
                             baselines[quarter][doc['id']] = 'not-yet-built'
                 self.setting(conn, 'report_baselines', baselines)
+            self.relocate_files(conn)
+
+    def relocate_files(self, conn):
+        # A downloaded update may live in a different folder. Keep copied .data
+        # backups usable after the previous checkout has been removed.
+        for row in conn.execute('SELECT id,path FROM files').fetchall():
+            old = Path(row['path'])
+            uploaded = self.directory / 'uploads' / (row['id'] + old.suffix)
+            target = uploaded if uploaded.is_file() else None
+            if target is None and 'presentations' in old.parts:
+                relative = old.parts[old.parts.index('presentations'):]
+                original = ROOT.joinpath(*relative).resolve()
+                if original.is_relative_to(ROOT) and original.is_file():
+                    target = original
+            if target is not None and target != old:
+                conn.execute('UPDATE files SET path=? WHERE id=?', (str(target), row['id']))
 
     @staticmethod
     def setting(conn, key, value):
@@ -545,12 +561,12 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
-    def file(self,path,kind=None,download=False):
+    def file(self,path,kind=None,download=False,cache=True):
         self.send_response(200)
         self.send_header('Content-Type',kind or mimetypes.guess_type(path.name)[0] or 'application/octet-stream')
         self.send_header('Content-Length',str(path.stat().st_size))
         self.send_header('X-Content-Type-Options','nosniff')
-        self.send_header('Cache-Control','private, max-age=3600' if not download else 'no-store')
+        self.send_header('Cache-Control','private, max-age=3600' if cache and not download else 'no-store')
         if download:
             self.send_header('Content-Disposition',f'attachment; filename="report{path.suffix}"')
         self.end_headers()
@@ -640,7 +656,7 @@ class Handler(BaseHTTPRequestHandler):
             static=static.resolve()
             if not static.is_relative_to(STATIC) or not static.is_file():
                 raise KeyError('Страница не найдена.')
-            return self.file(static)
+            return self.file(static,cache=False)
         except (BrokenPipeError,ConnectionResetError):
             pass
         except Exception as exc:

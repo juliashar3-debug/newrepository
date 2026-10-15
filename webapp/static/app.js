@@ -95,8 +95,15 @@ function reportUpdateButton(report) {
 }
 function renderReportPrompt() {
   const report = state.meta.reports.find(item => item.quarter === state.quarter);
-  const prompt = $('#report-update-prompt');
+  const update = $('#update-report');
   const running = report?.job?.state === 'running';
+  if (update) {
+    update.disabled = !report || running;
+    update.innerHTML = `${icon('refresh')}${running ? 'Обновляем…' : 'Обновить PPTX и PDF'}`;
+    update.title = report ? 'Пересобрать презентацию и PDF по сохраненным мероприятиям' : 'Для этого квартала сначала нужно подготовить шаблон отчета';
+    update.setAttribute('aria-busy',String(running));
+  }
+  const prompt = $('#report-update-prompt');
   prompt.hidden = state.view === 'report' || (!report?.changed && !running);
   prompt.innerHTML = `<div><strong>${running ? 'Обновляем презентацию и PDF' : 'Обновить презентацию и PDF?'}</strong><p>${running ? esc(report.job.message) : 'Мероприятия изменились после сборки отчета. Сохраненные правки готовы к переносу в оба файла.'}</p></div>${reportUpdateButton(report)}`;
 }

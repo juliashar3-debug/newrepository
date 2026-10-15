@@ -2,6 +2,7 @@ import base64
 from email.parser import Parser
 from io import BytesIO
 import json
+import shutil
 from pathlib import Path
 import tempfile
 import threading
@@ -148,6 +149,24 @@ class JournalIntegrationTests(unittest.TestCase):
         self.assertEqual(status,200)
         self.assertIn('text/html',headers['Content-Type'])
         self.assertIn('Журнал мероприятий'.encode(),body)
+        self.assertEqual(headers['Cache-Control'],'no-store')
+        for path in ['/app.js','/style.css','/app.js?v=20261015-2']:
+            self.assertEqual(self.request(path)[1]['Cache-Control'],'no-store')
+
+    def test_data_copy_remaps_photos_to_new_folder(self):
+        event=self.create()
+        png=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQkAAAAASUVORK5CYII=')
+        uploaded=self.journal.upload(event['id'],png,'team.png')
+        with tempfile.TemporaryDirectory() as destination:
+            copied=Path(destination)/'data'
+            shutil.copytree(self.journal.directory,copied)
+            moved=Journal(copied)
+            fid=uploaded['photos'][0]['id']
+            with moved.db() as conn:
+                path=Path(conn.execute('SELECT path FROM files WHERE id=?',(fid,)).fetchone()[0])
+            self.assertTrue(path.is_relative_to(copied))
+            self.assertEqual(path.read_bytes(),png)
+            self.assertEqual(moved.event(event['id'])['name'],event['name'])
 
     def finish_build(self):
         self.assertTrue(self.journal.report_lock.acquire(timeout=10), 'report worker did not finish')

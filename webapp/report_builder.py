@@ -372,6 +372,8 @@ def event_pages(presentation, source_slide, event, files):
 
 
 def export_pdf(pptx, pdf, office):
+    pptx, pdf = Path(pptx).resolve(), Path(pdf).resolve()
+    program = 'PowerPoint' if office[0] == 'powerpoint' else 'LibreOffice'
     try:
         if office[0] == 'libreoffice':
             with tempfile.TemporaryDirectory(prefix='office-', dir=pptx.parent) as profile:
@@ -380,15 +382,39 @@ def export_pdf(pptx, pdf, office):
                                          '--outdir', str(pdf.parent), str(pptx)],
                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=180)
         else:
-            result = subprocess.run([office[1], '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
+            result = subprocess.run([office[1], '-STA', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
                                      '-File', str(Path(__file__).with_name('export-pdf.ps1')),
                                      str(pptx), str(pdf)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=180)
     except subprocess.TimeoutExpired as exc:
-        raise BuildError('Создание PDF заняло больше трех минут. Закройте зависший процесс экспорта и повторите обновление.') from exc
+        raise BuildError(f'{program} не завершил создание PDF за три минуты. Проверьте, нет ли в программе окна активации или другого диалога, и повторите обновление. Предыдущие файлы сохранены.') from exc
     except OSError as exc:
-        raise BuildError('Не удалось запустить программу для создания PDF. Проверьте установку LibreOffice или PowerPoint.') from exc
+        raise BuildError(f'Не удалось запустить {program} для создания PDF: {exc}. Предыдущие файлы сохранены.') from exc
     if result.returncode or not pdf.is_file() or not pdf.read_bytes().startswith(b'%PDF'):
-        raise BuildError('Программа не создала PDF. Проверьте установку LibreOffice или PowerPoint и повторите обновление. Предыдущие файлы сохранены.')
+        raise BuildError(export_error(result, office[0]))
+
+
+def export_error(result, program):
+    """Keep COM diagnostics readable on Russian Windows, including PowerShell 5."""
+    output = '\n'.join(value.decode('utf-8', errors='replace') if isinstance(value, bytes) else value or ''
+                       for value in [result.stdout, result.stderr])
+    detail = ''
+    for line in output.splitlines():
+        if line.startswith('SMS_POWERPOINT_ERROR='):
+            try:
+                error = json.loads(line.split('=', 1)[1])
+                step = {'start': 'запуск', 'open': 'открытие презентации', 'save': 'сохранение PDF'}.get(error.get('stage'), 'экспорт')
+                detail = f"{step}, {error.get('hresult', '')}: {error.get('message', '')}"
+            except (ValueError, AttributeError):
+                continue
+            break
+    if not detail:
+        detail = ' '.join(output.split()) or f'код завершения {result.returncode}; корректный PDF не получен'
+    detail = ' '.join(detail.split())[:1200]
+    if program == 'powerpoint':
+        return (f'PowerPoint не создал PDF. Причина: {detail}. '
+                'Откройте PowerPoint вручную, завершите активацию или первый запуск, если программа их предлагает, '
+                'и закройте открытые диалоги. Затем повторите сборку. Предыдущие файлы сохранены.')
+    return f'LibreOffice не создал PDF. Причина: {detail}. Повторите сборку. Предыдущие файлы сохранены.'
 
 
 def build(snapshot, directory, stage=lambda message: None):

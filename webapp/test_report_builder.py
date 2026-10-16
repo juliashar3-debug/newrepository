@@ -1,11 +1,59 @@
 """Real editable PPTX -> PDF integration; enabled when an office converter is installed."""
 from io import BytesIO
+import json
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import report_builder
 from server import Journal
+
+
+class PdfExportTests(unittest.TestCase):
+    def test_powerpoint_receives_absolute_unicode_paths_and_sta(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            pptx = Path(temporary) / 'Отчет СМС.pptx'
+            pdf = pptx.with_suffix('.pdf')
+            pptx.write_bytes(b'presentation')
+            def exported(command, **kwargs):
+                self.assertIn('-STA', command)
+                self.assertEqual(command[-2:], [str(pptx.resolve()), str(pdf.resolve())])
+                pdf.write_bytes(b'%PDF-test')
+                return subprocess.CompletedProcess(command, 0, b'', b'')
+            with patch.object(report_builder.subprocess, 'run', side_effect=exported):
+                report_builder.export_pdf(pptx, pdf, ('powerpoint', 'powershell.exe'))
+            self.assertTrue(pdf.is_file())
+
+    def test_powerpoint_com_error_is_shown_in_russian_even_with_partial_pdf(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            pptx = Path(temporary) / 'report.pptx'
+            pdf = pptx.with_suffix('.pdf')
+            pdf.write_bytes(b'%PDF-incomplete')
+            diagnostic = {'stage': 'save', 'hresult': '0x80004005', 'message': 'Не удалось сохранить файл'}
+            output = ('SMS_POWERPOINT_ERROR=' + json.dumps(diagnostic, ensure_ascii=False)).encode('utf-8')
+            result = subprocess.CompletedProcess([], 1, output, b'')
+            with patch.object(report_builder.subprocess, 'run', return_value=result):
+                with self.assertRaises(report_builder.BuildError) as raised:
+                    report_builder.export_pdf(pptx, pdf, ('powerpoint', 'powershell.exe'))
+            for text in ['PowerPoint', 'сохранение PDF', '0x80004005', diagnostic['message'], 'Предыдущие файлы сохранены']:
+                self.assertIn(text, str(raised.exception))
+
+    def test_success_exit_without_pdf_is_rejected_and_powershell_stderr_is_visible(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            pptx = Path(temporary) / 'report.pptx'
+            result = subprocess.CompletedProcess([], 0, b'', b'Script execution failed')
+            with patch.object(report_builder.subprocess, 'run', return_value=result):
+                with self.assertRaisesRegex(report_builder.BuildError, 'Script execution failed'):
+                    report_builder.export_pdf(pptx, pptx.with_suffix('.pdf'), ('powerpoint', 'powershell.exe'))
+
+    def test_powerpoint_timeout_mentions_blocking_dialogs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            pptx = Path(temporary) / 'report.pptx'
+            with patch.object(report_builder.subprocess, 'run', side_effect=subprocess.TimeoutExpired('powershell', 180)):
+                with self.assertRaisesRegex(report_builder.BuildError, 'активации.*Предыдущие файлы сохранены'):
+                    report_builder.export_pdf(pptx, pptx.with_suffix('.pdf'), ('powerpoint', 'powershell.exe'))
 
 
 @unittest.skipUnless(report_builder.capabilities()['ready'], 'Install report requirements and LibreOffice or PowerPoint')

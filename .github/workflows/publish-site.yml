@@ -2,7 +2,7 @@ name: Publish SMS journal
 on:
   push:
     branches: [main]
-    paths: ['index.html', 'site/**', 'webapp/public/**', 'webapp/static/style.css', 'webapp/server.py', 'webapp/report_builder.py', 'webapp/requirements.txt', 'presentations/**', 'tools/build_public_site.py', '.github/workflows/publish-site.yml']
+    paths: ['index.html', 'site/**', 'webapp/public/**', 'webapp/static/**', 'webapp/online_store.py', 'webapp/server.py', 'webapp/report_builder.py', 'webapp/requirements.txt', 'presentations/**', 'tools/build_public_site.py', '.github/workflows/publish-site.yml']
   workflow_dispatch:
 permissions:
   contents: read

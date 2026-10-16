@@ -1,16 +1,17 @@
-"""Build a read-only website from repository materials for GitHub Pages."""
+"""Build the full GitHub-backed website and a public fallback snapshot."""
 import argparse
-from datetime import datetime, timezone
 import json
-from pathlib import Path
 import shutil
 import sys
 import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'webapp'))
-from server import Journal  # noqa: E402
-from PIL import Image, ImageOps  # noqa: E402
+from online_store import REPORTS, load_online
+from PIL import Image, ImageOps
+from server import Journal
 
 
 def build(output):
@@ -20,12 +21,22 @@ def build(output):
     output.mkdir(parents=True, exist_ok=True)
     for folder in ['photos', 'reports']:
         (output / folder).mkdir()
-    for name in ['index.html', 'public.js', 'public.css']:
+    for name in ['public.js', 'public.css', 'online.js', 'online.css']:
         shutil.copy2(ROOT / 'webapp/public' / name, output / name)
     shutil.copy2(ROOT / 'webapp/static/style.css', output / 'style.css')
+    shutil.copy2(ROOT / 'webapp/static/app.js', output / 'app.js')
+    html = (ROOT / 'webapp/static/index.html').read_text(encoding='utf-8')
+    html = html.replace('href="/', 'href="./').replace('src="/', 'src="./')
+    html = html.replace('<script src="./app.js', '<link rel="stylesheet" href="online.css?v=20261016-2">\n  <script src="online.js?v=20261016-2" defer></script>\n  <script src="./app.js')
+    html = html.replace('20261016-1', '20261016-2').replace('Личная локальная версия', 'Онлайн-журнал · GitHub')
+    html = html.replace('<span class="avatar"', '<button id="owner-connect" class="button secondary">Подключить владельца</button><span class="avatar"')
+    html = html.replace('</body>', (ROOT / 'webapp/public/owner-dialog.html').read_text(encoding='utf-8') + '\n</body>')
+    (output / 'index.html').write_text(html, encoding='utf-8')
     (output / '.nojekyll').touch()
     with tempfile.TemporaryDirectory(prefix='sms-public-') as temporary:
         journal = Journal(Path(temporary) / 'data')
+        online = load_online(journal)
+        (output / 'online-snapshot.json').write_text(json.dumps({'journal': online, 'reports': json.loads(REPORTS.read_text(encoding='utf-8'))}, ensure_ascii=False), encoding='utf-8')
         meta = journal.metadata()
         with journal.db() as connection:
             files = {row['id']: Path(row['path']) for row in connection.execute('SELECT id,path FROM files')}

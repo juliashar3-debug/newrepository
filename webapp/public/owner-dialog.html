@@ -1,0 +1,17 @@
+<dialog id="owner-dialog" aria-labelledby="owner-title">
+  <form id="owner-form" class="panel">
+    <h2 id="owner-title">Подключить владельца GitHub</h2>
+    <p>Редактирование доступно аккаунту <strong>juliashar3-debug</strong>. Мероприятия и фото сохраняются в открытом репозитории <strong>newrepository</strong>.</p>
+    <ol>
+      <li><a href="https://github.com/settings/personal-access-tokens/new?name=SMS-journal&amp;target_name=juliashar3-debug&amp;contents=write&amp;actions=read" target="_blank" rel="noopener noreferrer">Создайте ключ доступа на GitHub</a> (Fine-grained personal access token).</li>
+      <li>В Repository access выберите <strong>Only select repositories → newrepository</strong>.</li>
+      <li>В Repository permissions: <strong>Contents → Read and write</strong>, <strong>Actions → Read-only</strong>. Нажмите Generate token.</li>
+      <li>Вставьте полученный ключ в поле ниже. Не отправляйте его в чат.</li>
+    </ol>
+    <label class="field">Ключ GitHub<input type="password" name="key" required autocomplete="off" spellcheck="false" placeholder="github_pat_…"></label>
+    <p class="muted-note">Ключ используется только в этой вкладке и отправляется только GitHub. После перезагрузки страницы потребуется подключиться снова.</p>
+    <div id="owner-error" class="banner error" role="alert" hidden></div>
+    <div class="button-row"><button type="submit" class="button primary">Подключить</button><button type="button" id="owner-cancel" class="button secondary">Отмена</button></div>
+  </form>
+</dialog>
+<dialog id="public-card" aria-label="Карточка мероприятия"></dialog>

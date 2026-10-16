@@ -38,6 +38,7 @@ function dateLabel(event) {
 }
 function notify(message,error = false) { const el = $('#toast'); el.textContent = message; el.classList.toggle('error',error); el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => el.hidden = true,5500); }
 async function api(url,options = {}) {
+  if (window.smsOnline) return window.smsOnline.api(url,options);
   const response = await fetch(url,{...options,headers:{...(options.body && typeof options.body === 'string' ? {'Content-Type':'application/json'} : {}),...options.headers}});
   let result;
   try { result = await response.json(); } catch { throw new Error('Сервер не ответил. Проверьте, что журнал запущен.'); }
@@ -53,11 +54,11 @@ async function load() {
     const quarters = [...new Set([...meta.quarters,state.quarter])].sort().reverse();
     $('#quarter-select').innerHTML = quarters.map(q => `<option value="${esc(q)}">${esc(quarterLabel(q))}</option>`).join('');
     $('#quarter-select').value = state.quarter; $('#quarter-select').dataset.loaded = '1';
-    $('#connection').innerHTML = '<i></i>На этом компьютере';
+    $('#connection').innerHTML = window.smsOnline ? '<i></i>' + (window.smsOnline.isOwner() ? 'Владелец · GitHub' : 'Опубликованный журнал') : '<i></i>На этом компьютере';
     render();
     meta.reports.filter(report => report.job?.state === 'running').forEach(report => watchReport(report.quarter));
   } catch (e) {
-    error.textContent = `${e.message} Обновите страницу после запуска сервера.`; error.hidden = false;
+    error.textContent = window.smsOnline ? e.message : `${e.message} Обновите страницу после запуска сервера.`; error.hidden = false;
     $('#connection').textContent = 'Нет соединения';
     $('#event-grid').innerHTML = empty('Не удалось загрузить журнал','Сведения появятся после подключения к локальному серверу.');
   }
@@ -128,7 +129,7 @@ function watchReport(quarter) {
       if (report) report.job = status;
       if (status.state === 'running') {
         if (state.quarter === quarter) render();
-        reportPolls.set(quarter,setTimeout(tick,1000));
+        reportPolls.set(quarter,setTimeout(tick,window.smsOnline ? 10000 : 1000));
       } else {
         reportPolls.delete(quarter);
         await load();
@@ -172,7 +173,7 @@ function renderReport() {
   const report = state.meta.reports.find(r => r.quarter === state.quarter);
   const events = sorted(selectedEvents());
   const missing = events.filter(e => e.issues.length);
-  const fmt = type => `/api/report?quarter=${encodeURIComponent(state.quarter)}&format=${type}`;
+  const fmt = type => window.smsOnline ? window.smsOnline.reportUrl(state.quarter,type) : `/api/report?quarter=${encodeURIComponent(state.quarter)}&format=${type}`;
   const running = report?.job?.state === 'running';
   const ready = report?.available.pdf && report?.available.pptx;
   const updated = report?.updated_at ? new Date(report.updated_at).toLocaleString('ru-RU') : report?.updated_date;
@@ -184,7 +185,7 @@ function renderReport() {
       <div class="button-row">${reportUpdateButton(report)}
         ${report?.available.pdf ? `<a class="button secondary" href="${fmt('pdf')}">${icon('report')}Скачать PDF</a>` : ''}
         ${report?.available.pptx ? `<a class="button secondary" href="${fmt('pptx')}">${icon('download')}Скачать PPTX</a>` : ''}
-        <a class="button secondary" href="/api/export.zip?quarter=${encodeURIComponent(state.quarter)}">${icon('download')}Материалы квартала · ZIP</a>
+        <a class="button secondary" href="${window.smsOnline ? '#' : '/api/export.zip?quarter='+encodeURIComponent(state.quarter)}" ${window.smsOnline ? 'data-online-zip' : ''}>${icon('download')}Материалы квартала · ZIP</a>
       </div>
       ${running ? `<p class="build-progress" role="status">${icon('refresh')}${esc(report.job.message)}${ready ? ' Предыдущие файлы доступны до окончания обновления.' : ''}</p>` : ready ? (report.changed ? '<p class="muted-note">Материалы изменены. Нажмите «Обновить», чтобы перенести сохраненные правки в презентацию и PDF.</p>' : '<p class="muted-note">Презентация и PDF соответствуют сохраненным мероприятиям.</p>') : '<p class="muted-note">Нажмите «Сформировать». После сборки здесь появятся кнопки скачивания PPTX и PDF.</p>'}
       ${report?.job?.state === 'error' ? `<div class="banner error" role="alert">${esc(report.job.message)}</div>` : ''}
@@ -201,13 +202,18 @@ function renderPlans() {
   $('#plans-view').innerHTML = `<div class="banner info">Предложения на ${esc(quarterLabel(plan.target_quarter))}. План пока не утвержден.</div><div class="plan-grid">${plan.goals_and_tasks.map((p,i) => `<article class="panel plan-card"><span class="plan-number">0${i+1}</span><p class="eyebrow">ЦЕЛЬ</p><h2>${esc(p.goal)}</h2><div class="task"><p class="eyebrow">КОНКРЕТНАЯ ЗАДАЧА</p><p>${esc(p.task)}</p></div></article>`).join('')}</div>`;
 }
 function renderHelp() {
+  if (window.smsOnline) { $('#help-view').innerHTML=window.smsOnline.help(); return; }
   $('#help-view').innerHTML = `<div class="help-grid"><section class="panel"><div class="help-number">ШАГ 01</div><h2>Расскажи о событии</h2><p>Укажи название, дату, организатора и коротко опиши участие команды. Неизвестные сведения можно оставить пустыми и дополнить позже.</p></section><section class="panel"><div class="help-number">ШАГ 02</div><h2>Добавь фотографии</h2><p>Загрузи снимки и выбери общее фото — для центра коллажа. Сохраняются оригиналы. Число одних и тех же людей на разных снимках не складываем.</p></section><section class="panel"><div class="help-number">ШАГ 03</div><h2>Обнови отчет</h2><p>После сохранения карточки журнал предложит обновить презентацию и PDF. Нажми «Обновить» и дождись завершения. Оба новых файла появятся в разделе «Квартальный отчет».</p></section></div><section class="panel"><h2>Что важно при заполнении</h2><p>Численность относится к команде ЦКБА. Для расчетных значений выбирай отметку «Расчетное число» и записывай формулу. При неизвестной дате выбери квартал вручную. Если дата указана, квартал определяется по ней.</p><p>Сборка сохраняет оформление отчета, общий снимок в центре и неизвестные числа прочерками. Для создания PDF нужен LibreOffice или Microsoft PowerPoint в Windows. Длинный текст продолжается на дополнительных слайдах.</p><p>Журнал и новые версии отчета хранятся на компьютере, где запущен сервер. Если редактировать карточки во время сборки, журнал предложит обновить отчет еще раз. Для передачи агенту используй выгрузку журнала или архив квартала.</p><p>Восстановить карточку из архива можно через фильтр «Архив». Удаление снимка из карточки не стирает исходный файл.</p></section>`;
 }
 function clearForm() {
   state.pending.forEach(p => URL.revokeObjectURL(p.url)); state.pending=[]; state.removed=[]; state.editing=null; state.mainPhoto=''; state.changed=false;
   $('#event-form').reset(); $('#form-error').hidden=true; $('#save-status').textContent='';
 }
-function openForm(id) {
+async function openForm(id) {
+  if (window.smsOnline && !window.smsOnline.isOwner()) {
+    if (id) { window.smsOnline.viewCard(state.events.find(e=>e.id===id)); return; }
+    try { await window.smsOnline.ensureOwner(); await load(); } catch { return; }
+  }
   clearForm();
   const event = id ? state.events.find(e => e.id === id) : null;
   state.editing = event ? structuredClone(event) : null;
@@ -273,6 +279,11 @@ async function saveForm(event) {
   controls.forEach(control => control.disabled=true);
   try {
     $('#save-status').textContent='Сохраняем сведения…';
+    if (window.smsOnline) {
+      const saved=await window.smsOnline.saveCard(payload,{event:state.editing,pending:state.pending,removed:state.removed,mainPhoto:state.mainPhoto});
+      state.quarter=saved.quarter; state.saving=false; closeForm(true); await load();
+      notify('Мероприятие и фотографии сохранены в GitHub. Можно обновить отчёт.'); return;
+    }
     state.editing=await api(state.editing ? `/api/events/${encodeURIComponent(state.editing.id)}` : '/api/events',{method:'POST',body:JSON.stringify(payload)});
     while (state.removed.length) {
       const id=state.removed[0];
@@ -293,7 +304,7 @@ async function saveForm(event) {
     state.quarter=state.editing.quarter;
     state.saving=false; closeForm(true); await load(); notify('Мероприятие сохранено. Материалы можно дополнить позже.');
   } catch (e) {
-    error.textContent=`${e.message}${state.editing ? ' Уже сохраненные сведения и загруженные фото не потеряны.' : ''}`; error.hidden=false;
+    error.textContent=`${e.message}${state.editing && !window.smsOnline ? ' Уже сохраненные сведения и загруженные фото не потеряны.' : ''}`; error.hidden=false;
     renderPhotos();
   } finally {
     controls.forEach(control => control.disabled=false);
@@ -311,7 +322,10 @@ $('#event-form').addEventListener('input',() => state.changed=true);
 $('#event-form').addEventListener('submit',saveForm);
 $('#quarter-select').addEventListener('change',event => { state.quarter=event.target.value; state.filter='all'; render(); });
 $('#search').addEventListener('input',event => { state.search=event.target.value; renderEvents(); });
-$('#export-button').addEventListener('click',() => location.assign(`/api/export?quarter=${encodeURIComponent(state.quarter)}`));
+$('#export-button').addEventListener('click',() => window.smsOnline ? window.smsOnline.exportQuarter(state.quarter,false).catch(e=>notify(e.message,true)) : location.assign(`/api/export?quarter=${encodeURIComponent(state.quarter)}`));
+document.addEventListener('click',e=>{ if(e.target.closest('[data-online-zip]')) { e.preventDefault(); window.smsOnline.exportQuarter(state.quarter,true).catch(e=>notify(e.message,true)); } });
+window.addEventListener('sms-online-connected',()=>load());
+window.addEventListener('sms-online-edit',async e=>{ await load(); openForm(e.detail); });
 $('#menu-toggle').addEventListener('click',() => $('#sidebar').classList.toggle('open'));
 $$('.nav-item').forEach(el => el.addEventListener('click',() => { state.view=el.dataset.view; $('#sidebar').classList.remove('open'); render(); }));
 $$('.tab').forEach(el => el.addEventListener('click',() => { state.filter=el.dataset.filter; renderEvents(); }));

@@ -4,40 +4,95 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#173e71">
-  <meta name="description" content="Мероприятия и квартальные отчеты Совета молодых специалистов АО ЦКБА.">
-  <title>СМС · Мероприятия и отчеты ЦКБА</title>
-  <link rel="stylesheet" href="./style.css">
-  <link rel="stylesheet" href="./public.css">
-  <script src="./public.js" defer></script>
+  <title>СМС · Журнал мероприятий ЦКБА</title>
+  <meta name="description" content="Личный журнал мероприятий Совета молодых специалистов АО ЦКБА: фотографии, участники и квартальные отчеты.">
+  <link rel="stylesheet" href="./style.css?v=20261016-2">
+  <link rel="stylesheet" href="online.css?v=20261016-2">
+  <script src="online.js?v=20261016-2" defer></script>
+  <script src="./app.js?v=20261016-2" defer></script>
 </head>
 <body>
-<div class="shell">
-  <aside class="sidebar" id="sidebar">
-    <a class="brand" href="./"><span class="brand-mark">С</span><span>СМС<span class="brand-sub">Журнал мероприятий</span></span></a>
-    <div class="workspace-label">СОВЕТ МОЛОДЫХ СПЕЦИАЛИСТОВ</div>
-    <nav class="navigation" aria-label="Основное меню">
-      <button class="nav-item active" data-view="events">Мероприятия<span id="nav-count" class="nav-count">—</span></button>
-      <button class="nav-item" data-view="report">Квартальный отчет</button>
-      <button class="nav-item" data-view="plans">Цели и задачи</button>
-      <button class="nav-item" data-view="help">О журнале</button>
-    </nav>
-    <div class="sidebar-note"><strong>События, которые объединяют</strong><p>Спорт, общение и совместные проекты молодых специалистов.</p></div>
-    <div class="sidebar-bottom"><span class="company-symbol">ЦКБА</span><strong>Совет молодых специалистов</strong><span>АО ЦКБА · Тула</span><small>Публичная версия для просмотра</small></div>
-  </aside>
-  <div class="main-wrap">
-    <header class="topbar"><button id="menu-toggle" class="icon-button mobile-only" aria-label="Открыть меню" aria-expanded="false">☰</button><div class="breadcrumb">Журнал СМС <span>/</span><strong id="breadcrumb-current">Мероприятия</strong></div><div class="topbar-right"><span class="connection"><i></i>Для просмотра</span><span class="avatar" aria-hidden="true">СМ</span></div></header>
-    <main id="main">
-      <div class="page-heading"><div><p class="eyebrow">СОВЕТ МОЛОДЫХ СПЕЦИАЛИСТОВ</p><h1 id="page-title">Мероприятия совета</h1><p id="page-subtitle">События, фотографии и квартальные отчеты.</p></div></div>
-      <div class="quarter-bar"><label class="quarter-select"><select id="quarter-select" aria-label="Отчетный квартал"><option>Загрузка…</option></select></label><span id="period-label" class="period-label"></span></div>
-      <div id="load-error" class="banner error" role="alert" hidden></div>
-      <section id="events-view" class="view"><div class="stats" id="stats"></div><div class="list-toolbar"><p>Опубликованные мероприятия</p><label class="search"><input id="search" type="search" placeholder="Найти мероприятие" aria-label="Поиск мероприятия"></label></div><div id="event-grid" class="event-grid" aria-live="polite"></div></section>
-      <section id="report-view" class="view" hidden></section>
-      <section id="plans-view" class="view" hidden></section>
-      <section id="help-view" class="view" hidden></section>
-      <div class="journal-footer" id="publication-note"></div>
-    </main>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="./" aria-label="Главная страница журнала"><span class="brand-mark">С</span><span>СМС<span class="brand-sub">Журнал мероприятий</span></span></a>
+      <div class="workspace-label">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+      <nav class="navigation" aria-label="Основное меню">
+        <button class="nav-item active" data-view="events"><span data-icon="grid"></span>Мероприятия<span id="nav-count" class="nav-count">—</span></button>
+        <button class="nav-item" data-view="report"><span data-icon="report"></span>Квартальный отчет</button>
+        <button class="nav-item" data-view="plans"><span data-icon="flag"></span>Цели и задачи</button>
+        <button class="nav-item" data-view="help"><span data-icon="help"></span>Как пользоваться</button>
+      </nav>
+      <div class="sidebar-note"><span data-icon="spark"></span><strong>Один шаг после события</strong><p>Добавь фотографии и несколько строк. К концу квартала материалы уже будут на месте.</p></div>
+      <div class="sidebar-bottom"><span class="company-symbol">ЦКБА</span><strong>Совет молодых специалистов</strong><span>АО ЦКБА · Тула</span><small>Онлайн-журнал · GitHub</small></div>
+    </aside>
+    <div class="main-wrap">
+      <header class="topbar">
+        <button id="menu-toggle" class="icon-button mobile-only" aria-label="Открыть меню"><span data-icon="menu"></span></button>
+        <div class="breadcrumb">Личный журнал <span>/</span> <strong id="breadcrumb-current">Мероприятия</strong></div>
+        <div class="topbar-right"><span class="connection" id="connection"><i></i>На этом компьютере</span><button id="owner-connect" class="button secondary">Подключить владельца</button><span class="avatar" aria-hidden="true">СМ</span></div>
+      </header>
+      <main id="main" tabindex="-1">
+        <div class="page-heading"><div><p class="eyebrow">СОВЕТ МОЛОДЫХ СПЕЦИАЛИСТОВ</p><h1 id="page-title">Мероприятия совета</h1><p id="page-subtitle">Все события, фотографии и важные детали — в одном месте.</p></div><button class="button primary" id="add-event"><span data-icon="plus"></span>Добавить мероприятие</button></div>
+        <div class="quarter-bar"><label class="quarter-select"><span data-icon="calendar"></span><select id="quarter-select" aria-label="Отчетный квартал"><option>Загрузка…</option></select><span data-icon="chevron"></span></label><span class="period-label" id="period-label"></span><div class="quarter-actions"><button class="button primary" id="update-report" data-report-update disabled><span data-icon="refresh"></span>Обновить PPTX и PDF</button><button class="text-button" id="export-button"><span data-icon="download"></span>Выгрузить журнал</button></div></div>
+        <div id="load-error" class="banner error" role="alert" hidden></div>
+        <div id="report-update-prompt" class="banner info report-update-prompt" role="status" hidden></div>
+        <section id="events-view" class="view">
+          <div class="stats" id="stats"><div class="stat loading-stat">Загружаем журнал…</div></div>
+          <div class="list-toolbar"><div class="tabs" role="group" aria-label="Фильтр мероприятий"><button class="tab active" data-filter="all">Все события <span id="tab-all">0</span></button><button class="tab" data-filter="ready">Готовы к отчету</button><button class="tab" data-filter="attention">Нужно дополнить</button><button class="tab" data-filter="excluded">Не включены</button><button class="tab" data-filter="archived">Архив</button></div><label class="search"><span data-icon="search"></span><input id="search" type="search" placeholder="Найти мероприятие" aria-label="Поиск мероприятия"></label></div>
+          <div class="event-grid" id="event-grid" aria-live="polite"></div>
+          <div class="journal-footer"><span data-icon="check"></span><span>Сведения и оригиналы фото сохраняются после нажатия «Сохранить».</span></div>
+        </section>
+        <section id="report-view" class="view" hidden></section>
+        <section id="plans-view" class="view" hidden></section>
+        <section id="help-view" class="view" hidden></section>
+      </main>
+    </div>
   </div>
-</div>
-<dialog id="event-dialog" aria-labelledby="event-title"><div id="event-detail"></div></dialog>
+  <dialog id="event-dialog" aria-labelledby="form-title">
+    <form id="event-form">
+      <div class="dialog-heading"><div><p class="eyebrow">КАРТОЧКА МЕРОПРИЯТИЯ</p><h2 id="form-title">Новое мероприятие</h2><p>Можно сохранить сейчас и дополнить сведения позже.</p></div><button type="button" id="close-form" class="icon-button" aria-label="Закрыть форму"><span data-icon="close"></span></button></div>
+      <div class="form-layout"><div class="form-fields">
+        <section class="form-section"><h3><span>01</span>Основное</h3>
+          <label class="field">Название мероприятия <span class="required">*</span><input name="name" maxlength="250" required placeholder="Например, командный квиз"></label>
+          <div class="field-row"><label class="field">Дата начала<input name="date" type="date"></label><label class="field">Дата окончания<input name="date_end" type="date"></label></div>
+          <label class="field">Отчетный квартал <span class="required">*</span><div class="field-row"><input name="year" type="number" min="2000" max="2100" required aria-label="Год"><select name="quarter_number" aria-label="Квартал"><option value="1">I квартал</option><option value="2">II квартал</option><option value="3">III квартал</option><option value="4">IV квартал</option></select></div><small>Если дата известна, квартал определится автоматически.</small></label>
+          <label class="field">Организатор<input name="organizer" maxlength="1000" placeholder="Организация или подтвержденная роль"></label>
+          <label class="field">Краткое описание<textarea name="description" rows="3" maxlength="6000" placeholder="Что происходило и как участвовала команда ЦКБА"></textarea></label>
+          <label class="field">Эффект мероприятия<textarea name="effect" rows="2" maxlength="6000" placeholder="Чем мероприятие было полезно для команды"></textarea></label>
+        </section>
+        <section class="form-section"><h3><span>02</span>Участники</h3><p class="field-hint">Указываем свою команду. Поле можно оставить пустым, если число пока неизвестно.</p>
+          <div class="field-row"><label class="field">Всего в команде<input name="total_attendance" type="number" min="0" max="1000000" step="1" placeholder="—"><select name="total_type" aria-label="Источник общего числа"><option value="confirmed">Подтверждено</option><option value="photo">По общему фото</option><option value="calculated">Расчетное число</option></select></label><label class="field">Из СМС<input name="sms_attendance" type="number" min="0" max="1000000" step="1" placeholder="—"><select name="sms_type" aria-label="Источник числа участников СМС"><option value="confirmed">Подтверждено</option><option value="calculated">Расчетное число</option></select></label></div>
+          <label class="field">Формула или источник численности<input name="formula" maxlength="1000" placeholder="Например: 28 по фото − 8 = 20 из СМС"><small>Формула относится только к этому мероприятию. Членство в СМС по фото не определяется.</small></label>
+          <label class="field">Что нужно уточнить / заметки<textarea name="notes" rows="2" maxlength="6000" placeholder="Вопросы, ссылки на источники и важные детали"></textarea></label>
+          <label class="checkbox-field"><input name="include" type="checkbox" checked><span><strong>Включить в квартальный отчет</strong><small>Неполные данные можно уточнить перед сборкой.</small></span></label>
+        </section>
+      </div><aside class="photo-panel"><h3><span>03</span>Фотографии <span class="photo-counter" id="photo-counter">0</span></h3><p>Выбери общий снимок: он займет центр коллажа в презентации.</p>
+        <label class="dropzone" id="dropzone"><input id="photo-input" type="file" accept="image/jpeg,image/png,image/webp" multiple><span class="upload-icon" data-icon="upload"></span><strong>Перетащи фотографии сюда</strong><span>или <u>выбери файлы</u></span><small>JPG, PNG, WebP · до 20 МБ каждый</small></label>
+        <div class="photo-list" id="photo-list"></div><p class="photo-hint"><span data-icon="image"></span>Исходные снимки сохраняются. Число людей с разных фотографий не суммируется.</p>
+      </aside></div>
+      <div id="form-error" class="banner error" role="alert" hidden></div>
+      <footer class="dialog-footer"><button type="button" class="text-button danger" id="archive-event" hidden><span data-icon="archive"></span><span>В архив</span></button><span class="save-status" id="save-status"></span><button type="button" class="button secondary" id="cancel-form">Отмена</button><button type="submit" class="button primary" id="save-event"><span data-icon="check"></span>Сохранить</button></footer>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><p>Для работы журнала включите JavaScript в браузере.</p></noscript>
+<dialog id="owner-dialog" aria-labelledby="owner-title">
+  <form id="owner-form" class="panel">
+    <h2 id="owner-title">Подключить владельца GitHub</h2>
+    <p>Редактирование доступно аккаунту <strong>juliashar3-debug</strong>. Мероприятия и фото сохраняются в открытом репозитории <strong>newrepository</strong>.</p>
+    <ol>
+      <li><a href="https://github.com/settings/personal-access-tokens/new?name=SMS-journal&amp;target_name=juliashar3-debug&amp;contents=write&amp;actions=read" target="_blank" rel="noopener noreferrer">Создайте ключ доступа на GitHub</a> (Fine-grained personal access token).</li>
+      <li>В Repository access выберите <strong>Only select repositories → newrepository</strong>.</li>
+      <li>В Repository permissions: <strong>Contents → Read and write</strong>, <strong>Actions → Read-only</strong>. Нажмите Generate token.</li>
+      <li>Вставьте полученный ключ в поле ниже. Не отправляйте его в чат.</li>
+    </ol>
+    <label class="field">Ключ GitHub<input type="password" name="key" required autocomplete="off" spellcheck="false" placeholder="github_pat_…"></label>
+    <p class="muted-note">Ключ используется только в этой вкладке и отправляется только GitHub. После перезагрузки страницы потребуется подключиться снова.</p>
+    <div id="owner-error" class="banner error" role="alert" hidden></div>
+    <div class="button-row"><button type="submit" class="button primary">Подключить</button><button type="button" id="owner-cancel" class="button secondary">Отмена</button></div>
+  </form>
+</dialog>
+<dialog id="public-card" aria-label="Карточка мероприятия"></dialog>
+
 </body>
 </html>

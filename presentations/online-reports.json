@@ -1,0 +1,19 @@
+{
+  "2026-Q3": {
+    "pdf": "presentations/2026-Q3/ЦКБА_III_квартал_2026_Гонка_героев.pdf",
+    "pptx": "presentations/2026-Q3/ЦКБА_III_квартал_2026_Гонка_героев.pptx",
+    "slide_count": 11,
+    "event_count": 8,
+    "updated_date": "2026-10-15",
+    "revisions": {
+      "night_tula_run": 1,
+      "hero_race": 1,
+      "kayak_trip_2026_08_08": 1,
+      "dragon_boat_cup": 1,
+      "evocom_5_10km": 1,
+      "orienteering_2026_08_30": 1,
+      "armory_halfmarathon": 1,
+      "museum_quiz_2026_09_17": 1
+    }
+  }
+}

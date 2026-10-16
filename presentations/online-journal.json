@@ -1,0 +1,487 @@
+{
+  "schema_version": 1,
+  "default_quarter": "2026-Q3",
+  "events": [
+    {
+      "id": "relay_autumn",
+      "name": "Эстафета — осень",
+      "date": "",
+      "date_end": "",
+      "quarter": "2026-Q3",
+      "organizer": "Тульское беговое сообщество «Тульский Марафон»",
+      "description": "Участие сотрудников АО ЦКБА в осенней легкоатлетической эстафете. Командное прохождение дистанции с передачей эстафеты между участниками.",
+      "effect": "Развитие командного взаимодействия и взаимоподдержки, укрепление корпоративных связей и популяризация активного образа жизни.",
+      "sms_attendance": null,
+      "total_attendance": null,
+      "sms_type": "confirmed",
+      "total_type": "confirmed",
+      "formula": "",
+      "notes": "",
+      "include": false,
+      "photos": [],
+      "revision": 1,
+      "archived": false,
+      "updated_at": "2026-10-16T10:17:53+00:00"
+    },
+    {
+      "id": "night_tula_run",
+      "name": "Забег «Ночная Тула»",
+      "date": "2026-07-18",
+      "date_end": "",
+      "quarter": "2026-Q3",
+      "organizer": "Тульское беговое сообщество «Тульский Марафон»",
+      "description": "Участие сотрудников ЦКБА совместно с сотрудниками «Высокоточных комплексов» в городском забеге «Ночная Тула» 18 июля 2026 года.",
+      "effect": "Укрепление связей между коллективами ЦКБА и «Высокоточных комплексов», поддержка командного взаимодействия и популяризация физической активности.",
+      "sms_attendance": 17,
+      "total_attendance": 23,
+      "sms_type": "calculated",
+      "total_type": "photo",
+      "formula": "23 × (1 − 0.25)",
+      "notes": "",
+      "include": true,
+      "photos": [
+        {
+          "id": "83b05621f59b9cec0a280be8",
+          "name": "night-tula-team.jpg",
+          "description": "Joint team photo at the corporate team banner",
+          "group": true,
+          "repository_path": "presentations/2026-Q3/night-tula-team.jpg"
+        },
+        {
+          "id": "e3f7312a8a8a72f261711019",
+          "name": "night-tula-runners-portrait.jpg",
+          "description": "Two runners in festive accessories",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/night-tula-runners-portrait.jpg"
+        },
+        {
+          "id": "fec2942493ad2d0e11798098",
+          "name": "night-tula-runners-wide.jpg",
+          "description": "Runners near the Tula Kremlin",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/night-tula-runners-wide.jpg"
+        }
+      ],
+      "revision": 1,
+      "archived": false,
+      "updated_at": "2026-10-16T10:17:53+00:00"
+    },
+    {
+      "id": "hero_race",
+      "name": "Гонка героев",
+      "date": "2026-09-05",
+      "date_end": "2026-09-05",
+      "quarter": "2026-Q3",
+      "organizer": "АНО \"Лига героев\"",
+      "description": "Командное участие сотрудников АО ЦКБА и ЦНИИАГ в спортивном мероприятии «Гонка героев» с прохождением полосы препятствий, требующей выносливости, взаимопомощи и согласованных действий.",
+      "effect": "Развитие командного взаимодействия и взаимоподдержки, укрепление сплоченности коллектива, популяризация физической активности.",
+      "sms_attendance": 19,
+      "total_attendance": 20,
+      "sms_type": "confirmed",
+      "total_type": "confirmed",
+      "formula": "",
+      "notes": "",
+      "include": true,
+      "photos": [
+        {
+          "id": "7835e1c25fa772935113c316",
+          "name": "image-14-10-26-03-39-1.jpeg",
+          "description": "Фотография «Гонки героев»",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39-1.jpeg"
+        },
+        {
+          "id": "bbc6a142c65be262ca996dc8",
+          "name": "image-14-10-26-03-39-2.jpeg",
+          "description": "Фотография «Гонки героев»",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39-2.jpeg"
+        },
+        {
+          "id": "e55fb4edf39e04f2ced08962",
+          "name": "image-14-10-26-03-39-3.jpeg",
+          "description": "Фотография «Гонки героев»",
+          "group": true,
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39-3.jpeg"
+        },
+        {
+          "id": "40b636beeac870f1e5de8f88",
+          "name": "image-14-10-26-03-39.jpeg",
+          "description": "Фотография «Гонки героев»",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/image-14-10-26-03-39.jpeg"
+        }
+      ],
+      "revision": 1,
+      "archived": false,
+      "updated_at": "2026-10-16T10:17:53+00:00"
+    },
+    {
+      "id": "kayak_trip_2026_08_08",
+      "name": "Сплав на байдарках",
+      "date": "2026-08-08",
+      "date_end": "2026-08-09",
+      "quarter": "2026-Q3",
+      "organizer": "СМ ЦКБА",
+      "description": "Сплав сотрудников ЦКБА и ЦНИИАГ на байдарках по реке Проня в г. Рязани 8–9 августа 2026 года.",
+      "effect": "Развитие командного взаимодействия и взаимопомощи, укрепление связей между сотрудниками ЦКБА и популяризация активного отдыха на природе.",
+      "sms_attendance": 20,
+      "total_attendance": 22,
+      "sms_type": "calculated",
+      "total_type": "photo",
+      "formula": "22 − 2 = 20",
+      "notes": "",
+      "include": true,
+      "photos": [
+        {
+          "id": "3e4a70e10cd1ffb665e50234",
+          "name": "IMG_6413.jpeg",
+          "description": "Group on river bank with kayaks",
+          "group": true,
+          "repository_path": "presentations/2026-Q3/kayak/IMG_6413.jpeg"
+        },
+        {
+          "id": "a8a6e91d93921f40b7d75003",
+          "name": "IMG_6528.jpeg",
+          "description": "Two participants in blue kayak",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/kayak/IMG_6528.jpeg"
+        },
+        {
+          "id": "12bd22e90cabf2ee9c5b7c82",
+          "name": "IMG_6534.jpeg",
+          "description": "Two participants in red kayak",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/kayak/IMG_6534.jpeg"
+        }
+      ],
+      "revision": 1,
+      "archived": false,
+      "updated_at": "2026-10-16T10:17:53+00:00"
+    },
+    {
+      "id": "dragon_boat_cup",
+      "name": "Кубок Тульского дракона — 2026",
+      "date": "2026-08-15",
+      "date_end": "",
+      "quarter": "2026-Q3",
+      "organizer": "Министерство спорта Тульской области; Тульская областная федерация гребли на байдарках и каноэ",
+      "description": "Командное участие сотрудников в корпоративных соревнованиях по гребле на лодках класса «Дракон».",
+      "effect": "Развитие согласованности действий и взаимопомощи, укрепление командного духа.",
+      "sms_attendance": 17,
+      "total_attendance": 20,
+      "sms_type": "confirmed",
+      "total_type": "confirmed",
+      "formula": "",
+      "notes": "",
+      "include": true,
+      "photos": [
+        {
+          "id": "2e843455f2e1eb29d125ce1a",
+          "name": "IMG_6812.png",
+          "description": "Участники с веслами в лодке класса «Дракон» у причала.",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/dragon-boat/IMG_6812.png"
+        },
+        {
+          "id": "35224217135c1cdb7d00c552",
+          "name": "IMG_6795.jpeg",
+          "description": "Общее фото команды с флагом ЦКБА у баннера Кубка Тульского дракона.",
+          "group": true,
+          "repository_path": "presentations/2026-Q3/dragon-boat/IMG_6795.jpeg"
+        },
+        {
+          "id": "3ae5171f6a6313672e1e3156",
+          "name": "IMG_6158.jpeg",
+          "description": "Два участника с веслами на переднем плане в лодке у причала.",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/dragon-boat/IMG_6158.jpeg"
+        }
+      ],
+      "revision": 1,
+      "archived": false,
+      "updated_at": "2026-10-16T10:17:53+00:00"
+    },
+    {
+      "id": "evocom_5_10km",
+      "name": "ЭвоКом полумарафон «Тула»: дистанции 5 и 10 км",
+      "date": "2026-08-22",
+      "date_end": "2026-08-23",
+      "quarter": "2026-Q3",
+      "organizer": "Тульское беговое сообщество «Тульский Марафон»",
+      "description": "Участие команды сотрудников в забегах на дистанции 5 и 10 км в рамках «ЭвоКом полумарафона Тула».",
+      "effect": "Популяризация регулярной физической активности, укрепление корпоративных связей и взаимоподдержки.",
+      "sms_attendance": 20,
+      "total_attendance": 28,
+      "sms_type": "calculated",
+      "total_type": "photo",
+      "formula": "total: N; sms: N − 8",
+      "notes": "",
+      "include": true,
+      "photos": [
+        {
+          "id": "2eccdb94e3f93894b78ab5a1",
+          "name": "IMG_6950.jpeg",
+          "description": "Ночное групповое фото с флагом ЦКБА.",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/evocom/IMG_6950.jpeg"
+        },
+        {
+          "id": "c308ddb42aeff7b9f4d54334",
+          "name": "IMG_6985.jpeg",
+          "description": "Общее фото группы с флагом ЦКБА и медалями у баннера «ЭвоКом полумарафон Тула».",
+          "group": true,
+          "repository_path": "presentations/2026-Q3/evocom/IMG_6985.jpeg"
+        },
+        {
+          "id": "d9802aa913d6b647c95e8207",
+          "name": "IMG_7054.jpeg",
+          "description": "Дневной снимок двух участниц с медалями у зеркальной фотозоны «ЭвоКом полумарафон Тула».",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/evocom/IMG_7054.jpeg"
+        }
+      ],
+      "revision": 1,
+      "archived": false,
+      "updated_at": "2026-10-16T10:17:53+00:00"
+    },
+    {
+      "id": "orienteering_2026_08_30",
+      "name": "Соревнования по спортивному ориентированию",
+      "date": "2026-08-30",
+      "date_end": "",
+      "quarter": "2026-Q3",
+      "organizer": "Тульская федерация спортивного ориентирования",
+      "description": "Участие сотрудников в соревнованиях по спортивному ориентированию с прохождением дистанции и поиском контрольных пунктов.",
+      "effect": "Развитие навыков ориентирования, самостоятельного принятия решений и физической подготовки.",
+      "sms_attendance": 13,
+      "total_attendance": 15,
+      "sms_type": "calculated",
+      "total_type": "calculated",
+      "formula": "total: N + 2; sms: (N + 2) − 2 = N",
+      "notes": "",
+      "include": true,
+      "photos": [
+        {
+          "id": "c3292e260af7f0f6c1e56052",
+          "name": "IMG_7461.jpeg",
+          "description": "Участник изучает карту дистанции спортивного ориентирования.",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/orienteering/IMG_7461.jpeg"
+        },
+        {
+          "id": "aa2b90919f99805541daacda",
+          "name": "IMG_7454.jpeg",
+          "description": "Общее фото группы с номерами участников в лесу.",
+          "group": true,
+          "repository_path": "presentations/2026-Q3/orienteering/IMG_7454.jpeg"
+        },
+        {
+          "id": "16010baa296c94ab0a7c9ccf",
+          "name": "IMG_7470.jpeg",
+          "description": "Участница с картой дистанции спортивного ориентирования.",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/orienteering/IMG_7470.jpeg"
+        }
+      ],
+      "revision": 1,
+      "archived": false,
+      "updated_at": "2026-10-16T10:17:53+00:00"
+    },
+    {
+      "id": "armory_halfmarathon",
+      "name": "Полумарафон «Оружейная столица»",
+      "date": "2026-09-13",
+      "date_end": "",
+      "quarter": "2026-Q3",
+      "organizer": "Тульское беговое сообщество «Тульский Марафон»",
+      "description": "Участие команды сотрудников в полумарафоне «Оружейная столица» в Туле.",
+      "effect": "Поддержка активного образа жизни, укрепление командных и корпоративных связей.",
+      "sms_attendance": 28,
+      "total_attendance": 38,
+      "sms_type": "confirmed",
+      "total_type": "confirmed",
+      "formula": "",
+      "notes": "",
+      "include": true,
+      "photos": [
+        {
+          "id": "038653c1c2ec4c0fc6d19b23",
+          "name": "IMG_7884.jpeg",
+          "description": "Групповое фото с флагом ЦКБА у баннера полумарафона «Оружейная столица».",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/armory-halfmarathon/IMG_7884.jpeg"
+        },
+        {
+          "id": "5fea45afa827a047a777672e",
+          "name": "IMG_7961.jpeg",
+          "description": "Общее фото группы с флагом ЦКБА и медалями на фоне Тульского кремля; участники стоят и сидят на переднем плане.",
+          "group": true,
+          "repository_path": "presentations/2026-Q3/armory-halfmarathon/IMG_7961.jpeg"
+        },
+        {
+          "id": "d6c0b7a8b0700a221671d632",
+          "name": "IMG_7929.jpeg",
+          "description": "Широкий групповой снимок участников с медалями в один ряд на фоне Тульского кремля.",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/armory-halfmarathon/IMG_7929.jpeg"
+        }
+      ],
+      "revision": 1,
+      "archived": false,
+      "updated_at": "2026-10-16T10:17:53+00:00"
+    },
+    {
+      "id": "museum_quiz_2026_09_17",
+      "name": "Интеллектуальная игра «Брейн-ринг» в музее оружия",
+      "date": "2026-09-17",
+      "date_end": "",
+      "quarter": "2026-Q3",
+      "organizer": "При содействии Тульского регионального отделения Союза машиностроителей России",
+      "description": "Участие команды сотрудников в интеллектуальной игре «Брейн-ринг», посвященной Дню оружейника, в Тульском музее оружия.",
+      "effect": "Развитие эрудиции, командного обсуждения и навыков совместного принятия решений.",
+      "sms_attendance": 6,
+      "total_attendance": 6,
+      "sms_type": "confirmed",
+      "total_type": "confirmed",
+      "formula": "",
+      "notes": "Подтверждено содействие в организации; полный состав организаторов не установлен.",
+      "include": true,
+      "photos": [
+        {
+          "id": "a00bbd2d171f7c197c2be4fe",
+          "name": "IMG_8168.jpeg",
+          "description": "Командное обсуждение за игровым столом на фоне экрана «День оружейника».",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/brain-ring/IMG_8168.jpeg"
+        },
+        {
+          "id": "ef9e11b2ceb66dafb8cdf439",
+          "name": "IMG_8128.jpeg",
+          "description": "Общее фото с флагом ЦКБА и Союза машиностроителей России перед экраном в музее.",
+          "group": true,
+          "repository_path": "presentations/2026-Q3/brain-ring/IMG_8128.jpeg"
+        },
+        {
+          "id": "fdcba6eca6a906ad4311cf35",
+          "name": "IMG_8138.jpeg",
+          "description": "Двое мужчин в деловой одежде в музейном зале.",
+          "group": false,
+          "repository_path": "presentations/2026-Q3/brain-ring/IMG_8138.jpeg"
+        }
+      ],
+      "revision": 1,
+      "archived": false,
+      "updated_at": "2026-10-16T10:17:53+00:00"
+    }
+  ],
+  "plans": [
+    {
+      "report_quarter": "2027-Q1",
+      "target_quarter": "2027-Q2",
+      "status": "proposed",
+      "goals_and_tasks": [
+        {
+          "goal": "Обмен практическими навыками",
+          "task": "Провести встречу «Инструменты в работе»: короткие разборы от молодых специалистов."
+        },
+        {
+          "goal": "Знакомство с культурой города",
+          "task": "Организовать весеннюю экскурсию по Туле: тему и дату выбрать вместе с участниками."
+        },
+        {
+          "goal": "Совместная помощь по запросу",
+          "task": "Согласовать с партнером один запрос на помощь и собрать добровольцев для общей акции."
+        },
+        {
+          "goal": "Участие молодежи в планировании",
+          "task": "Собрать отзывы после мероприятий и уточнить календарь следующего сезона."
+        }
+      ]
+    },
+    {
+      "report_quarter": "2026-Q4",
+      "target_quarter": "2027-Q1",
+      "status": "proposed",
+      "goals_and_tasks": [
+        {
+          "goal": "Обмен практическими навыками",
+          "task": "Провести встречу «Инструменты в работе»: короткие разборы от молодых специалистов."
+        },
+        {
+          "goal": "Доступный зимний досуг",
+          "task": "Подготовить командную зимнюю прогулку: маршрут и нагрузку выбрать через опрос."
+        },
+        {
+          "goal": "Совместная помощь по запросу",
+          "task": "Согласовать с партнером один запрос на помощь и собрать добровольцев для общей акции."
+        },
+        {
+          "goal": "Участие молодежи в планировании",
+          "task": "Собрать отзывы после мероприятий и уточнить календарь следующего сезона."
+        }
+      ],
+      "updated_date": "2026-10-16"
+    },
+    {
+      "report_quarter": "2026-Q3",
+      "target_quarter": "2026-Q4",
+      "status": "proposed",
+      "goals_and_tasks": [
+        {
+          "goal": "Адаптация новых молодых специалистов",
+          "task": "Запустить встречи «Первый год в ЦКБА»: наставник и небольшая группа новичков."
+        },
+        {
+          "goal": "Сохранение интереса к доступному спорту",
+          "task": "Организовать командную прогулку с элементами ориентирования в октябре."
+        },
+        {
+          "goal": "Развитие культуры взаимопомощи",
+          "task": "Провести добровольческую акцию, выбрав ее формат через опрос СМС."
+        },
+        {
+          "goal": "Развитие интеллектуального досуга",
+          "task": "Подготовить внутренний «Брейн-ринг»: смешанные команды из подразделений."
+        }
+      ],
+      "revision_history": [
+        {
+          "status": "superseded proposal",
+          "note": "Предыдущий вариант до наполнения отчета всеми восемью мероприятиями.",
+          "goals_and_tasks": [
+            {
+              "goal": "Укрепление взаимодействия внутри ЦКБА и с коллегами из холдинга",
+              "task": "Провести встречу участников гонки, забега и сплава: обмен опытом"
+            },
+            {
+              "goal": "Вовлечение новичков в доступные совместные мероприятия",
+              "task": "Подготовить совместный зимний квиз и пригласить новых участников"
+            },
+            {
+              "goal": "Обмен практическим опытом между молодыми специалистами",
+              "task": "Организовать встречу «Обмен опытом» с короткими выступлениями коллег"
+            },
+            {
+              "goal": "Учет интересов молодежи при подготовке плана на 2027 год",
+              "task": "Собрать идеи через опрос и составить проект плана мероприятий на 2027 год"
+            }
+          ]
+        }
+      ],
+      "updated_date": "2026-10-15"
+    }
+  ],
+  "order": {
+    "2026-Q3": [
+      "night_tula_run",
+      "kayak_trip_2026_08_08",
+      "dragon_boat_cup",
+      "evocom_5_10km",
+      "orienteering_2026_08_30",
+      "hero_race",
+      "armory_halfmarathon",
+      "museum_quiz_2026_09_17"
+    ]
+  }
+}

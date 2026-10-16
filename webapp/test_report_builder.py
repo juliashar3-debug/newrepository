@@ -10,6 +10,44 @@ from server import Journal
 
 @unittest.skipUnless(report_builder.capabilities()['ready'], 'Install report requirements and LibreOffice or PowerPoint')
 class ReportBuilderIntegrationTests(unittest.TestCase):
+    def test_new_q4_report_changes_period_plan_and_does_not_reuse_q3_photos(self):
+        import hashlib
+        import zipfile
+        from PIL import Image
+        from pptx import Presentation
+        from pypdf import PdfReader
+        with tempfile.TemporaryDirectory() as temporary:
+            journal=Journal(Path(temporary)/'data')
+            new=journal.save(None,{'name':'Командная встреча октября','date':'2026-10-18','quarter':'2026-Q4',
+                                  'description':'Совместное обсуждение проектов и обмен опытом.','organizer':'Совет молодых специалистов'})
+            image=BytesIO()
+            Image.new('RGB',(120,80),'#1279a2').save(image,'PNG')
+            journal.upload(new['id'],image.getvalue(),'q4-group.png')
+            excluded=journal.save(None,{'name':'Исключенная встреча','quarter':'2026-Q4','include':False})
+            archived=journal.save(None,{'name':'Архивная встреча','quarter':'2026-Q4'})
+            journal.archive(archived['id'],True)
+            snapshot=journal.report_snapshot('2026-Q4')
+            result=report_builder.build(snapshot,Path(temporary)/'output')
+            presentation=Presentation(Path(temporary)/'output/report.pptx')
+            pdf=PdfReader(Path(temporary)/'output/report.pdf')
+            self.assertIn('IV квартал 2026',presentation.core_properties.title)
+            text=' '.join(' '.join(page.extract_text().split()) for page in pdf.pages)
+            self.assertEqual((result['event_count'],result['slide_count'],len(pdf.pages)),(1,4,4))
+            self.assertIn('IV КВАРТАЛ 2026 ГОДА',text)
+            self.assertIn('В IV КВАРТАЛЕ 2026 ГОДА',text)
+            self.assertIn('НА I КВАРТАЛ 2027 ГОДА',text)
+            self.assertIn('Командная встреча октября',text)
+            for prior in ['III КВАРТАЛ','Ночная Тула','Гонка героев','Исключенная встреча','Архивная встреча','Первый год в ЦКБА']:
+                self.assertNotIn(prior,text)
+            template=Presentation(snapshot['template'])
+            oldphotos={hashlib.sha256(shape.image.blob).digest() for slide in list(template.slides)[:2] for shape in list(slide.shapes)[:3] if shape.shape_type==13}
+            newphotos={hashlib.sha256(shape.image.blob).digest() for slide in presentation.slides for shape in slide.shapes if shape.shape_type==13}
+            self.assertFalse(oldphotos & newphotos)
+            with zipfile.ZipFile(Path(temporary)/'output/report.pptx') as archive:
+                embedded={hashlib.sha256(archive.read(name)).digest() for name in archive.namelist() if name.startswith('ppt/media/')}
+            self.assertFalse(oldphotos & embedded)
+            self.assertTrue(any(shape.shape_type==13 and 'q4-group.png' in shape.name for shape in presentation.slides[1].shapes))
+
     def test_changed_fields_membership_photos_and_long_text_reach_both_formats(self):
         from PIL import Image
         from pptx import Presentation

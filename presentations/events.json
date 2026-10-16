@@ -959,7 +959,8 @@
     "running_event_organizer_source": "user instruction",
     "group_photo_position": "center",
     "report_period": "2026-Q3",
-    "attendance_display": "Только число и слово человек в подходящей форме; пояснения и формулы сохраняются в журнале и заметках слайда."
+    "attendance_display": "Только число и слово человек в подходящей форме; пояснения и формулы сохраняются в журнале и заметках слайда.",
+    "layout_template_quarter": "2026-Q3"
   },
   "report_order": {
     "2026-Q3": [

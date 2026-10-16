@@ -249,11 +249,42 @@ class JournalIntegrationTests(unittest.TestCase):
         self.assertEqual(self.request('/api/report/rebuild',{'quarter':'2026-Q3'},{'Origin':'https://example.org'})[0],403)
         self.assertEqual(self.request('/api/report/rebuild',{'quarter':'../../x'})[0],400)
         self.assertEqual(self.request('/api/report/rebuild',{'quarter':[]})[0],400)
-        self.assertEqual(self.request('/api/report/rebuild',{'quarter':'2028-Q2'})[0],400)
+        self.assertEqual(self.request('/api/report/rebuild',{'quarter':'2028-Q5'})[0],400)
         with patch('report_builder.capabilities',return_value={'ready':False,'message':'Установите LibreOffice'}):
             status,_,data=self.request('/api/report/rebuild',{'quarter':'2026-Q3'})
         self.assertEqual(status,400)
         self.assertIn('LibreOffice',json.loads(data)['error'])
+
+    def test_first_q4_report_uses_only_q4_events_and_survives_restart(self):
+        event=self.create(date='2026-11-07',quarter='2026-Q4')
+        report=next(r for r in self.journal.metadata()['reports'] if r['quarter']=='2026-Q4')
+        self.assertTrue(report['can_build'])
+        self.assertFalse(report['available']['pdf'])
+        snapshot=self.journal.report_snapshot('2026-Q4')
+        self.assertEqual([card['id'] for card in snapshot['events']],[event['id']])
+        self.assertEqual(snapshot['template_quarter'],'2026-Q3')
+        self.assertEqual(snapshot['plan']['target_quarter'],'2027-Q1')
+        self.assertFalse(snapshot['cover_photos'])
+        with patch('report_builder.capabilities',return_value={'ready':True}), patch('report_builder.build',side_effect=self.fake_build):
+            self.assertEqual(self.request('/api/report/rebuild',{'quarter':'2026-Q4'})[0],202)
+            self.finish_build()
+        reopened=Journal(self.temp.name)
+        report=next(r for r in reopened.metadata()['reports'] if r['quarter']=='2026-Q4')
+        self.assertEqual((report['slide_count'],report['event_count'],report['changed']),(4,1,0))
+        self.assertEqual(reopened.report_path('2026-Q4','pdf').read_bytes(),b'%PDF-new-report')
+
+    def test_upgrade_adds_q4_plan_without_overwriting_cards_or_existing_plan(self):
+        event=self.create(date='2026-11-07',quarter='2026-Q4')
+        with self.journal.db() as conn:
+            plans=json.loads(conn.execute("SELECT value FROM settings WHERE key='plans'").fetchone()[0])
+            plans['plans']=[plan for plan in plans['plans'] if plan['report_quarter']=='2026-Q3']
+            plans['plans'][0]['goals_and_tasks'][0]['goal']='Сохраненная правка владельца'
+            self.journal.setting(conn,'plans',plans)
+        reopened=Journal(self.temp.name)
+        self.assertEqual(reopened.event(event['id'])['name'],event['name'])
+        plans=reopened.metadata()['plans']
+        self.assertEqual(next(plan for plan in plans if plan['report_quarter']=='2026-Q3')['goals_and_tasks'][0]['goal'],'Сохраненная правка владельца')
+        self.assertEqual(next(plan for plan in plans if plan['report_quarter']=='2026-Q4')['target_quarter'],'2027-Q1')
 
 
 if __name__=='__main__':

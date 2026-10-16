@@ -91,21 +91,24 @@ function render() {
 }
 function reportUpdateButton(report) {
   const running = report?.job?.state === 'running';
-  return `<button class="button primary" data-report-update ${running ? 'disabled aria-busy="true"' : ''}>${icon('refresh')}${running ? 'Обновляем…' : 'Обновить'}</button>`;
+  const ready = report?.available.pdf && report?.available.pptx;
+  return `<button class="button primary" data-report-update ${running || !report?.can_build ? 'disabled' : ''} aria-busy="${running}">${icon('refresh')}${running ? 'Формируем…' : ready ? 'Обновить' : 'Сформировать'}</button>`;
 }
 function renderReportPrompt() {
   const report = state.meta.reports.find(item => item.quarter === state.quarter);
   const update = $('#update-report');
   const running = report?.job?.state === 'running';
   if (update) {
-    update.disabled = !report || running;
-    update.innerHTML = `${icon('refresh')}${running ? 'Обновляем…' : 'Обновить PPTX и PDF'}`;
-    update.title = report ? 'Пересобрать презентацию и PDF по сохраненным мероприятиям' : 'Для этого квартала сначала нужно подготовить шаблон отчета';
+    const ready = report?.available.pdf && report?.available.pptx;
+    update.disabled = !report?.can_build || running;
+    update.innerHTML = `${icon('refresh')}${running ? 'Формируем…' : ready ? 'Обновить PPTX и PDF' : 'Сформировать PPTX и PDF'}`;
+    update.title = report?.can_build ? 'Сформировать презентацию и PDF по сохраненным мероприятиям выбранного квартала' : 'Не найден файл шаблона. Скачайте репозиторий полностью';
     update.setAttribute('aria-busy',String(running));
   }
   const prompt = $('#report-update-prompt');
   prompt.hidden = state.view === 'report' || (!report?.changed && !running);
-  prompt.innerHTML = `<div><strong>${running ? 'Обновляем презентацию и PDF' : 'Обновить презентацию и PDF?'}</strong><p>${running ? esc(report.job.message) : 'Мероприятия изменились после сборки отчета. Сохраненные правки готовы к переносу в оба файла.'}</p></div>${reportUpdateButton(report)}`;
+  const ready = report?.available.pdf && report?.available.pptx;
+  prompt.innerHTML = `<div><strong>${running ? 'Формируем презентацию и PDF' : ready ? 'Обновить презентацию и PDF?' : 'Сформировать презентацию и PDF?'}</strong><p>${running ? esc(report.job.message) : ready ? 'Мероприятия изменились после сборки отчета. Сохраненные правки готовы к переносу в оба файла.' : 'Материалы выбранного квартала готовы к сборке. Неизвестные сведения останутся прочерками.'}</p></div>${reportUpdateButton(report)}`;
 }
 async function updateReport() {
   const quarter = state.quarter;
@@ -171,9 +174,27 @@ function renderReport() {
   const missing = events.filter(e => e.issues.length);
   const fmt = type => `/api/report?quarter=${encodeURIComponent(state.quarter)}&format=${type}`;
   const running = report?.job?.state === 'running';
+  const ready = report?.available.pdf && report?.available.pptx;
   const updated = report?.updated_at ? new Date(report.updated_at).toLocaleString('ru-RU') : report?.updated_date;
-  $('#report-view').innerHTML = `<section class="panel report-hero" aria-busy="${running}"><div><p class="eyebrow">${esc(quarterLabel(state.quarter).toUpperCase())}</p><h2>${running ? 'Обновляем отчет' : report?.changed ? 'В отчете есть новые изменения' : report ? 'Отчет готов к скачиванию' : 'Материалы будущего отчета'}</h2><p>${report ? `${report.slide_count} слайдов · ${report.event_count} мероприятий в последней сборке.${updated ? ` Обновлено: ${esc(updated)}.` : ''}` : 'Добавляйте мероприятия и фотографии. Для первой сборки квартала подготовьте шаблон вместе с агентом.'}</p><div class="button-row">${report ? reportUpdateButton(report) : ''}${report?.available.pdf ? `<a class="button secondary" href="${fmt('pdf')}">${icon('report')}Скачать PDF</a>` : ''}${report?.available.pptx ? `<a class="button secondary" href="${fmt('pptx')}">${icon('download')}Скачать PPTX</a>` : ''}<a class="button secondary" href="/api/export.zip?quarter=${encodeURIComponent(state.quarter)}">${icon('download')}Материалы квартала · ZIP</a></div>${running ? `<p class="build-progress" role="status">${icon('refresh')}${esc(report.job.message)} Предыдущие файлы доступны до окончания обновления.</p>` : report?.changed ? '<p class="muted-note">Мероприятия изменены. Нажмите «Обновить», чтобы перенести сохраненные правки в презентацию и PDF.</p>' : report ? '<p class="muted-note">Презентация и PDF соответствуют сохраненным мероприятиям.</p>' : ''}${report?.job?.state === 'error' ? `<div class="banner error" role="alert">${esc(report.job.message)}</div>` : ''}</div><div class="report-icon">${icon('report')}</div></section>${report && !state.meta.report_builder?.ready ? `<div class="banner info">${esc(state.meta.report_builder?.message)} <a href="https://www.libreoffice.org/download/download-libreoffice/" target="_blank" rel="noopener">Скачать LibreOffice</a></div>` : ''}<section class="panel"><h2>Войдут в отчет</h2><p>${events.length} мероприятий · ${missing.length ? `${missing.length} карточки требуют уточнения` : 'основные поля заполнены'}</p>${events.length ? `<ol class="report-list">${events.map((e,i) => `<li><span class="order-number">${i+1}</span><span>${esc(e.name)}</span><span class="status ${e.issues.length ? 'amber' : 'green'}">${e.issues.length ? esc(e.issues.join(', ')) : 'Готово'}</span></li>`).join('')}</ol>` : '<p>Пока нет мероприятий, отмеченных для включения.</p>'}</section>`;
+  const heading = running ? 'Формируем отчет' : ready ? (report.changed ? 'В отчете есть новые изменения' : 'Отчет готов к скачиванию') : 'Первый отчет за квартал';
+  const description = ready ? `Слайды: ${report.slide_count} · Мероприятия: ${report.event_count}.${updated ? ` Обновлено: ${esc(updated)}.` : ''}` : 'В отчет войдут только мероприятия выбранного квартала. Оформление сохранится, неизвестные сведения останутся прочерками.';
+  $('#report-view').innerHTML = `
+    <section class="panel report-hero" aria-busy="${running}"><div>
+      <p class="eyebrow">${esc(quarterLabel(state.quarter).toUpperCase())}</p><h2>${heading}</h2><p>${description}</p>
+      <div class="button-row">${reportUpdateButton(report)}
+        ${report?.available.pdf ? `<a class="button secondary" href="${fmt('pdf')}">${icon('report')}Скачать PDF</a>` : ''}
+        ${report?.available.pptx ? `<a class="button secondary" href="${fmt('pptx')}">${icon('download')}Скачать PPTX</a>` : ''}
+        <a class="button secondary" href="/api/export.zip?quarter=${encodeURIComponent(state.quarter)}">${icon('download')}Материалы квартала · ZIP</a>
+      </div>
+      ${running ? `<p class="build-progress" role="status">${icon('refresh')}${esc(report.job.message)}${ready ? ' Предыдущие файлы доступны до окончания обновления.' : ''}</p>` : ready ? (report.changed ? '<p class="muted-note">Материалы изменены. Нажмите «Обновить», чтобы перенести сохраненные правки в презентацию и PDF.</p>' : '<p class="muted-note">Презентация и PDF соответствуют сохраненным мероприятиям.</p>') : '<p class="muted-note">Нажмите «Сформировать». После сборки здесь появятся кнопки скачивания PPTX и PDF.</p>'}
+      ${report?.job?.state === 'error' ? `<div class="banner error" role="alert">${esc(report.job.message)}</div>` : ''}
+    </div><div class="report-icon">${icon('report')}</div></section>
+    ${!state.meta.report_builder?.ready ? `<div class="banner info">${esc(state.meta.report_builder?.message)} <a href="https://www.libreoffice.org/download/download-libreoffice/" target="_blank" rel="noopener">Скачать LibreOffice</a></div>` : ''}
+    <section class="panel"><h2>Войдут в отчет</h2><p>Мероприятий: ${events.length} · ${missing.length ? `Требуют уточнения: ${missing.length}` : 'Основные поля заполнены'}</p>
+      ${events.length ? `<ol class="report-list">${events.map((e,i) => `<li><span class="order-number">${i+1}</span><span>${esc(e.name)}</span><span class="status ${e.issues.length ? 'amber' : 'green'}">${e.issues.length ? esc(e.issues.join(', ')) : 'Готово'}</span></li>`).join('')}</ol>` : '<p>Пока нет мероприятий, отмеченных для включения. Можно сформировать начальный черновик и наполнить его позже.</p>'}
+    </section>`;
 }
+
 function renderPlans() {
   const plan = state.meta.plans.find(p => p.report_quarter === state.quarter);
   if (!plan) { $('#plans-view').innerHTML = empty('Предложения еще не подготовлены','План следующего квартала появится вместе с квартальной презентацией.'); return; }

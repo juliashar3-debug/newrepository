@@ -19,6 +19,76 @@ class BuildError(RuntimeError):
     pass
 
 
+def next_quarter(quarter):
+    year, number = quarter.split('-Q')
+    return f'{int(year) + (number == "4")}-Q{int(number) % 4 + 1}'
+
+
+def proposed_plan(quarter):
+    target = next_quarter(quarter)
+    season = int(target[-1])
+    activities = {
+        1: ('Доступный зимний досуг', 'Подготовить командную зимнюю прогулку:\nмаршрут и нагрузку выбрать через опрос.'),
+        2: ('Знакомство с культурой города', 'Организовать весеннюю экскурсию по Туле:\nтему и дату выбрать вместе с участниками.'),
+        3: ('Совместный активный отдых', 'Подготовить летний командный выезд:\nвыбрать доступный маршрут и собрать заявки.'),
+        4: ('Обмен результатами работы СМС', 'Провести итоговую встречу участников:\nобсудить опыт и предложения на новый год.'),
+    }
+    pairs = [
+        ('Обмен практическими навыками', 'Провести встречу «Инструменты в работе»:\nкороткие разборы от молодых специалистов.'),
+        activities[season],
+        ('Совместная помощь по запросу', 'Согласовать с партнером один запрос на помощь\nи собрать добровольцев для общей акции.'),
+        ('Участие молодежи в планировании', 'Собрать отзывы после мероприятий\nи уточнить календарь следующего сезона.'),
+    ]
+    return {'report_quarter': quarter, 'target_quarter': target, 'status': 'proposed',
+            'goals_and_tasks': [{'goal': goal, 'task': task.replace('\n', ' ')} for goal, task in pairs]}
+
+
+def set_period(shape, quarter):
+    year, number = quarter.split('-Q')
+    roman = ['I','II','III','IV'][int(number)-1]
+    text = re.sub(r'\b(?:IV|III|II|I)(?=\s+КВАРТАЛ)', roman, shape.text)
+    text = re.sub(r'\d{4}(?=\s+ГОДА)', year, text)
+    if text != shape.text:
+        set_text(shape, text)
+
+
+def configure_periods(slides, snapshot):
+    quarter = snapshot['quarter']
+    for slide in slides[:-1]:
+        for shape in slide.shapes:
+            if shape.has_text_frame and 'КВАРТАЛ' in shape.text and ('ВЫПОЛНЕН' in shape.text or 'МЕРОПРИЯТИЯ СОВЕТА' in shape.text or re.fullmatch(r'[IV]+ КВАРТАЛ \d{4} ГОДА', shape.text)):
+                set_period(shape, quarter)
+    final = slides[-1]
+    for shape in final.shapes:
+        if shape.has_text_frame and 'ЦЕЛИ И ЗАДАЧИ' in shape.text:
+            set_period(shape, next_quarter(quarter))
+    plan = snapshot['plan']
+    for index, pair in enumerate(plan['goals_and_tasks'][:4]):
+        for slot, key in [(19 + index * 11,'goal'), (63 + index * 11,'task')]:
+            shape = final.shapes[slot]
+            text = f'{index+1} {pair[key]}'
+            if ' '.join(shape.text.split()) == ' '.join(text.split()):
+                continue
+            size = shape.text_frame.paragraphs[0].runs[0].font.size
+            points = size.pt if size else 8
+            lines = wrapped(text, shape.width / 12700 * 12 / points)
+            set_text(shape, '\n'.join(lines))
+    for index in range(len(plan['goals_and_tasks']),4):
+        for slot in [19 + index * 11,63 + index * 11]:
+            set_text(final.shapes[slot],'')
+    final.notes_slide.notes_text_frame.text = json.dumps(plan, ensure_ascii=False, indent=2)
+    if quarter != snapshot['template_quarter']:
+        # Photos belong to their reporting period. A new cover stays empty until
+        # the owner explicitly supplies that quarter's cover photos.
+        cover = slides[0]
+        for index, shape in enumerate(list(cover.shapes)[:2]):
+            photos = snapshot.get('cover_photos', [])
+            if index < len(photos):
+                write_picture(cover, shape, Path(photos[index]), 'Фото титульного слайда')
+            else:
+                shape._element.getparent().remove(shape._element)
+
+
 def converter():
     candidates = [os.environ.get('SMS_SOFFICE'), shutil.which('soffice'), shutil.which('libreoffice'),
                   '/Applications/LibreOffice.app/Contents/MacOS/soffice']
@@ -106,7 +176,7 @@ def font_coverage(bold, italic):
             try:
                 with TTFont(candidate) as font:
                     return set(font.getBestCmap() or {})
-            except (OSError, TTLibError):
+            except (OSError, TTLibError, ImportError):
                 pass
     return None
 
@@ -185,8 +255,6 @@ def content(event):
 
 
 def replace_photos(slide, event, files):
-    from PIL import Image, ImageOps
-    from pptx.oxml.ns import qn
     # Preserve the exact approved crop when the event's photo selection is unchanged.
     source = event.get('source', {})
     originals = source.get('photos', [])
@@ -211,26 +279,32 @@ def replace_photos(slide, event, files):
             shape._element.getparent().remove(shape._element)
             continue
         path = Path(files[photo['id']]['path'])
-        try:
-            with Image.open(path) as original:
-                image = ImageOps.exif_transpose(original).convert('RGB')
-                image.thumbnail((2000, 2000), Image.Resampling.LANCZOS)
-                width, height = image.size
-                stream = BytesIO()
-                image.save(stream, 'JPEG', quality=94, optimize=True)
-        except (OSError, ValueError) as exc:
-            raise BuildError('Не удалось прочитать фотографию «' + photo['name'] + '». Загрузите исправный JPG, PNG или WebP.') from exc
-        stream.seek(0)
-        _, rid = slide.part.get_or_add_image_part(stream)
-        shape._element.blipFill.blip.set(qn('r:embed'), rid)
-        shape.name = photo['name'] + (' — общее фото' if photo is group else '')
-        shape._element.nvPicPr.cNvPr.set('descr', photo['name'])
-        shape.crop_left = shape.crop_right = shape.crop_top = shape.crop_bottom = 0
-        ratio, image_ratio = shape.width / shape.height, width / height
-        if image_ratio > ratio:
-            shape.crop_left = shape.crop_right = (1 - ratio / image_ratio) / 2
-        else:
-            shape.crop_top = shape.crop_bottom = (1 - image_ratio / ratio) / 2
+        write_picture(slide, shape, path, photo['name'] + (' — общее фото' if photo is group else ''))
+
+
+def write_picture(slide, shape, path, name):
+    from PIL import Image, ImageOps
+    from pptx.oxml.ns import qn
+    try:
+        with Image.open(path) as original:
+            image = ImageOps.exif_transpose(original).convert('RGB')
+            image.thumbnail((2000, 2000), Image.Resampling.LANCZOS)
+            width, height = image.size
+            stream = BytesIO()
+            image.save(stream, 'JPEG', quality=94, optimize=True)
+    except (OSError, ValueError) as exc:
+        raise BuildError('Не удалось прочитать фотографию «' + path.name + '». Загрузите исправный JPG, PNG или WebP.') from exc
+    stream.seek(0)
+    _, rid = slide.part.get_or_add_image_part(stream)
+    shape._element.blipFill.blip.set(qn('r:embed'), rid)
+    shape.name = name
+    shape._element.nvPicPr.cNvPr.set('descr', name)
+    shape.crop_left = shape.crop_right = shape.crop_top = shape.crop_bottom = 0
+    ratio, image_ratio = shape.width / shape.height, width / height
+    if image_ratio > ratio:
+        shape.crop_left = shape.crop_right = (1 - ratio / image_ratio) / 2
+    else:
+        shape.crop_top = shape.crop_bottom = (1 - image_ratio / ratio) / 2
 
 
 def event_pages(presentation, source_slide, event, files):
@@ -334,11 +408,20 @@ def build(snapshot, directory, stage=lambda message: None):
     event_slides = {}
     for event in snapshot['events']:
         source = event.get('source', {}).get('report_slide')
-        matched = bool(source and 1 < source < len(originals) - 1)
+        matched = bool(source and 1 < source < len(originals) - 1 and event.get('source',{}).get('reported_quarter') == snapshot['template_quarter'])
         event['template_matches'] = matched
         event_slides[event['id']] = len(slides) + 1
         slides.extend(event_pages(presentation, originals[source - 1] if matched else first_event, event, snapshot['files']))
     slides.extend(originals[-2:])
+    configure_periods(slides, snapshot)
+    # Removing a photo shape also needs to remove its unused package relation;
+    # otherwise a new quarter would still contain old image files internally.
+    for slide in slides:
+        used={value for node in slide._element.iter() for attr,value in node.attrib.items()
+              if attr.startswith('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}')}
+        for rid,relation in list(slide.part.rels.items()):
+            if relation.reltype.endswith('/image') and rid not in used:
+                slide.part.drop_rel(rid)
     # Keep source package parts for the template's logos, curves and editable artwork.
     identifiers = list(presentation.slides._sldIdLst)
     lookup = {presentation.part.related_slide(item.rId).part.partname: item for item in identifiers}
@@ -353,6 +436,9 @@ def build(snapshot, directory, stage=lambda message: None):
     # contiguous so another update can safely use this report as its template.
     for index, slide in enumerate(slides, 1):
         slide.part._partname = PackURI(f'/ppt/slides/slide{index}.xml')
+    year, number = snapshot['quarter'].split('-Q')
+    roman = ['I','II','III','IV'][int(number)-1]
+    presentation.core_properties.title = f'Отчет СМС АО ЦКБА за {roman} квартал {year} года'
     presentation.core_properties.subject = 'Обновлено по сохраненным карточкам сайта; неизвестные данные оставлены прочерками.'
     pptx = directory / 'report.pptx'
     pdf = directory / 'report.pdf'

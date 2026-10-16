@@ -76,6 +76,15 @@ class Journal:
             ''')
             if not conn.execute("SELECT 1 FROM settings WHERE key='initialized'").fetchone():
                 self.seed(conn)
+            # Add newly prepared quarterly proposals without overwriting the
+            # owner's saved plans or reimporting edited event cards.
+            saved_plans = json.loads(conn.execute("SELECT value FROM settings WHERE key='plans'").fetchone()[0])
+            known = {plan['report_quarter'] for plan in saved_plans['plans']}
+            defaults = json.loads((ROOT / 'presentations/plans.json').read_text())
+            for plan in defaults['plans']:
+                if plan['report_quarter'] not in known:
+                    saved_plans['plans'].append(plan)
+            self.setting(conn, 'plans', saved_plans)
             if not conn.execute("SELECT 1 FROM settings WHERE key='report_baselines'").fetchone():
                 journal = json.loads(conn.execute("SELECT value FROM settings WHERE key='journal'").fetchone()[0])
                 rows = conn.execute('SELECT * FROM events').fetchall()
@@ -125,6 +134,20 @@ class Journal:
         with self.jobs_lock:
             return dict(self.report_jobs.get(quarter, {'state': 'idle', 'message': ''}))
 
+    def report_template(self, journal):
+        quarter = journal.get('report_defaults',{}).get('layout_template_quarter','2026-Q3')
+        report = journal.get('reports',{}).get(quarter,{})
+        if not report.get('pptx'):
+            raise ValueError('Шаблон презентации не найден. Скачайте репозиторий полностью.')
+        template = (ROOT / report['pptx']).resolve()
+        if not template.is_relative_to(ROOT) or not template.is_file():
+            raise ValueError('Шаблон презентации не найден. Скачайте репозиторий полностью.')
+        return quarter, template
+
+    @staticmethod
+    def report_plan(settings, quarter):
+        return next((plan for plan in settings['plans']['plans'] if plan['report_quarter']==quarter),None) or report_builder.proposed_plan(quarter)
+
     def report_snapshot(self, quarter):
         if not re.fullmatch(r'\d{4}-Q[1-4]', quarter):
             raise ValueError('Неверный квартал.')
@@ -132,12 +155,14 @@ class Journal:
             conn.execute('BEGIN')
             settings = {row['key']: json.loads(row['value']) for row in conn.execute('SELECT * FROM settings')}
             journal = settings['journal']
-            report = journal.get('reports', {}).get(quarter)
-            if not report:
-                raise ValueError('Для этого квартала сначала нужен оформленный шаблон отчета. Сейчас обновление доступно для III квартала 2026 года.')
-            template = (ROOT / report['pptx']).resolve()
-            if not template.is_relative_to(ROOT) or not template.is_file():
-                raise ValueError('Шаблон презентации не найден. Скачайте репозиторий полностью.')
+            template_quarter, template = self.report_template(journal)
+            plan = self.report_plan(settings,quarter)
+            covers = []
+            for relative in journal.get('cover_photos',{}).get(quarter,{}).get('photos',[])[:2]:
+                path = (ROOT / relative).resolve()
+                if not path.is_relative_to(ROOT) or not path.is_file():
+                    raise ValueError('Фотография титульного слайда не найдена. Проверьте материалы выбранного квартала.')
+                covers.append(str(path))
             rows = conn.execute('SELECT * FROM events').fetchall()
             fingerprints = self.signatures(rows, quarter)
             events = []
@@ -158,7 +183,8 @@ class Journal:
                         raise ValueError('Не найдена фотография «' + photo['name'] + '». Скачайте все материалы или загрузите снимок заново.')
                     path = Path(row['path'])
                     files[photo['id']] = {**dict(row), 'repository_path': str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else None}
-        return {'quarter': quarter, 'template': str(template), 'events': events,
+        return {'quarter': quarter, 'template': str(template), 'template_quarter':template_quarter,
+                'plan':plan, 'cover_photos':covers, 'events': events,
                 'files': files, 'fingerprints': fingerprints}
 
     def rebuild_report(self, quarter):
@@ -201,6 +227,9 @@ class Journal:
                 baselines[quarter] = snapshot['fingerprints']
                 self.setting(conn, 'generated_reports', generated)
                 self.setting(conn, 'report_baselines', baselines)
+                if not any(plan['report_quarter']==quarter for plan in settings['plans']['plans']):
+                    settings['plans']['plans'].append(snapshot['plan'])
+                    self.setting(conn,'plans',settings['plans'])
             with self.jobs_lock:
                 self.report_jobs[quarter] = {'state': 'success', 'message': 'Презентация и PDF обновлены.'}
         except Exception as exc:
@@ -476,9 +505,16 @@ class Journal:
             rows=conn.execute('SELECT * FROM events').fetchall()
         journal=settings['journal']
         events=self.events()
-        quarters=sorted({e['quarter'] for e in events}|{'2026-Q3','2026-Q4','2027-Q1'},reverse=True)
+        quarters=sorted({e['quarter'] for e in events}|set(journal.get('reports',{}))|
+                        set(settings.get('generated_reports',{}))|{'2026-Q3','2026-Q4','2027-Q1'},reverse=True)
+        try:
+            self.report_template(journal)
+            can_build=True
+        except ValueError:
+            can_build=False
         reports=[]
-        for quarter, report in journal.get('reports',{}).items():
+        for quarter in quarters:
+            report=journal.get('reports',{}).get(quarter,{})
             generated=settings.get('generated_reports',{}).get(quarter)
             current=generated or report
             base=self.directory if generated else ROOT
@@ -488,10 +524,10 @@ class Journal:
             changed=sum(before.get(key)!=after.get(key) for key in before.keys()|after.keys())
             reports.append({**{k:current.get(k) for k in ['slide_count','event_count','updated_date','updated_at']},
                             'pending':report.get('pending',[]), 'job':self.report_status(quarter),
-                            'quarter':quarter,'available':available,
+                            'quarter':quarter,'available':available,'can_build':can_build,
                             'changed':changed})
         return {'quarters':quarters,'default_quarter':journal.get('report_defaults',{}).get('report_period','2026-Q3'),
-                'reports':reports,'plans':settings['plans']['plans'],
+                'reports':reports,'plans':[self.report_plan(settings,q) for q in quarters],
                 'order':journal.get('report_order',{}),'local_only':True,
                 'report_builder':report_builder.capabilities()}
 

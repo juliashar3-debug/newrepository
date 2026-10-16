@@ -167,7 +167,8 @@ class JournalIntegrationTests(unittest.TestCase):
         png=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQkAAAAASUVORK5CYII=')
         uploaded=self.journal.upload(event['id'],png,'team.png')
         with tempfile.TemporaryDirectory() as destination:
-            copied=Path(destination)/'data'
+            # Windows temp paths may use an 8.3 alias; Journal resolves aliases.
+            copied=Path(destination).resolve()/'data'
             shutil.copytree(self.journal.directory,copied)
             moved=Journal(copied)
             fid=uploaded['photos'][0]['id']

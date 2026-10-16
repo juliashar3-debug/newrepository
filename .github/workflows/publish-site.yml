@@ -2,7 +2,7 @@ name: Publish SMS journal
 on:
   push:
     branches: [main]
-    paths: ['webapp/public/**', 'webapp/static/style.css', 'webapp/server.py', 'webapp/report_builder.py', 'webapp/requirements.txt', 'presentations/**', 'tools/build_public_site.py', '.github/workflows/publish-site.yml']
+    paths: ['index.html', 'site/**', 'webapp/public/**', 'webapp/static/style.css', 'webapp/server.py', 'webapp/report_builder.py', 'webapp/requirements.txt', 'presentations/**', 'tools/build_public_site.py', '.github/workflows/publish-site.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,24 +25,14 @@ jobs:
           cache: pip
           cache-dependency-path: webapp/requirements.txt
       - run: python -m pip install -r webapp/requirements.txt
-      - run: python tools/build_public_site.py --output dist
+      - run: python tools/build_public_site.py --output dist/site
+      - run: cp index.html .nojekyll dist/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
       - uses: actions/configure-pages@v5
         with:
           enablement: true
-      - name: Use Actions as the Pages publishing source
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const site = await github.request('GET /repos/{owner}/{repo}/pages', context.repo);
-            if (site.data.build_type !== 'workflow') {
-              await github.request('PUT /repos/{owner}/{repo}/pages', {
-                ...context.repo, build_type: 'workflow'
-              });
-            }
-            core.info(`Pages URL: ${site.data.html_url}`);
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173e71">
+  <meta name="description" content="Мероприятия и квартальные отчеты Совета молодых специалистов АО ЦКБА.">
+  <title>СМС · Мероприятия и отчеты ЦКБА</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./public.css">
+  <script src="./public.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="./"><span class="brand-mark">С</span><span>СМС<span class="brand-sub">Журнал мероприятий</span></span></a>
+    <div class="workspace-label">СОВЕТ МОЛОДЫХ СПЕЦИАЛИСТОВ</div>
+    <nav class="navigation" aria-label="Основное меню">
+      <button class="nav-item active" data-view="events">Мероприятия<span id="nav-count" class="nav-count">—</span></button>
+      <button class="nav-item" data-view="report">Квартальный отчет</button>
+      <button class="nav-item" data-view="plans">Цели и задачи</button>
+      <button class="nav-item" data-view="help">О журнале</button>
+    </nav>
+    <div class="sidebar-note"><strong>События, которые объединяют</strong><p>Спорт, общение и совместные проекты молодых специалистов.</p></div>
+    <div class="sidebar-bottom"><span class="company-symbol">ЦКБА</span><strong>Совет молодых специалистов</strong><span>АО ЦКБА · Тула</span><small>Публичная версия для просмотра</small></div>
+  </aside>
+  <div class="main-wrap">
+    <header class="topbar"><button id="menu-toggle" class="icon-button mobile-only" aria-label="Открыть меню" aria-expanded="false">☰</button><div class="breadcrumb">Журнал СМС <span>/</span><strong id="breadcrumb-current">Мероприятия</strong></div><div class="topbar-right"><span class="connection"><i></i>Для просмотра</span><span class="avatar" aria-hidden="true">СМ</span></div></header>
+    <main id="main">
+      <div class="page-heading"><div><p class="eyebrow">СОВЕТ МОЛОДЫХ СПЕЦИАЛИСТОВ</p><h1 id="page-title">Мероприятия совета</h1><p id="page-subtitle">События, фотографии и квартальные отчеты.</p></div></div>
+      <div class="quarter-bar"><label class="quarter-select"><select id="quarter-select" aria-label="Отчетный квартал"><option>Загрузка…</option></select></label><span id="period-label" class="period-label"></span></div>
+      <div id="load-error" class="banner error" role="alert" hidden></div>
+      <section id="events-view" class="view"><div class="stats" id="stats"></div><div class="list-toolbar"><p>Опубликованные мероприятия</p><label class="search"><input id="search" type="search" placeholder="Найти мероприятие" aria-label="Поиск мероприятия"></label></div><div id="event-grid" class="event-grid" aria-live="polite"></div></section>
+      <section id="report-view" class="view" hidden></section>
+      <section id="plans-view" class="view" hidden></section>
+      <section id="help-view" class="view" hidden></section>
+      <div class="journal-footer" id="publication-note"></div>
+    </main>
+  </div>
+</div>
+<dialog id="event-dialog" aria-labelledby="event-title"><div id="event-detail"></div></dialog>
+</body>
+</html>

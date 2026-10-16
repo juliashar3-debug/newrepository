@@ -1,4 +1,5 @@
 @echo off
+set PYTHONUTF8=1
 cd /d "%~dp0"
 if exist ".venv\Scripts\python.exe" goto dependencies
 where py >nul 2>nul

@@ -1,0 +1,9 @@
+# Tools for the six repository skills; website features are enabled separately.
+-r requirements.txt
+pypdfium2>=4.30,<6
+pydantic>=2.10,<3
+pillow-heif>=0.18,<2
+openpyxl>=3.1.5,<4
+python-docx>=1.1.2,<2
+pytesseract>=0.3.13,<0.4
+openai>=1.60,<3

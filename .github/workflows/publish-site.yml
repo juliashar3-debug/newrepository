@@ -32,6 +32,17 @@ jobs:
       - uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Use Actions as the Pages publishing source
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const site = await github.request('GET /repos/{owner}/{repo}/pages', context.repo);
+            if (site.data.build_type !== 'workflow') {
+              await github.request('PUT /repos/{owner}/{repo}/pages', {
+                ...context.repo, build_type: 'workflow'
+              });
+            }
+            core.info(`Pages URL: ${site.data.html_url}`);
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
